@@ -11,7 +11,9 @@
     "lint": "eslint .",
     "lint:write": "eslint . --fix",
     "format": "npm run prettier && npm run lint",
-    "format:write": "npm run prettier:write && npm run lint:write"
+    "format:write": "npm run prettier:write && npm run lint:write",
+    "publish": "npm publish --userconfig ~/.npmrc-garethduncandev",
+    "whoami": "npm whoami --userconfig ~/.npmrc-garethduncandev"
   },
   "devDependencies": {
     "@types/node": "^20.8.3",
