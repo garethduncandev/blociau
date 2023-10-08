@@ -2,12 +2,20 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + TS</title>
+    <script type="module" src="/main.ts"></script>
+    <link rel="stylesheet" href="/main.css" />
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.ts"></script>
+    <img
+      style="display: none"
+      height="500"
+      width="500"
+      id="input"
+      src="/assets/circle.png"
+      alt="circle"
+    />
+    <div id="output"></div>
   </body>
 </html>

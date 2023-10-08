@@ -12,7 +12,8 @@ export default class Blocks {
     private blockHeight: number,
     private codeBlockMinWidth: number,
     private codeBlockMaxWidth: number,
-    private padding: number
+    private padding: number,
+    private styleVariationsCount: number
   ) {}
 
   public create(id: string, image: HTMLImageElement): SVGSVGElement {
@@ -256,8 +257,7 @@ export default class Blocks {
           columns[x].startY,
           columns[x].blockWidth,
           this.blockHeight,
-          this.codeBlockMinWidth,
-          this.codeBlockMaxWidth
+          this.styleVariationsCount
         );
         rectangles.push(rect);
       }
@@ -271,8 +271,7 @@ export default class Blocks {
     startY: number,
     codeBlockWidth: number,
     codeBlockHeight: number,
-    codeBlockMinWidth: number,
-    codeBlockMaxWidth: number
+    styleVariationsCount: number
   ): SVGRectElement {
     const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     rect.setAttribute('width', (codeBlockWidth - this.padding).toString());
@@ -282,8 +281,7 @@ export default class Blocks {
 
     const className = this.calculateRectClassName(
       codeBlockWidth,
-      codeBlockMinWidth,
-      codeBlockMaxWidth
+      styleVariationsCount
     );
     rect.setAttribute('class', className);
 
@@ -292,39 +290,20 @@ export default class Blocks {
 
   private calculateRectClassName(
     blockWidth: number,
-    codeBlockMinWidth: number,
-    codeBlockMaxWidth: number
+    styleVariationsCount: number
   ): string {
     let className: string = '';
+
     do {
-      if (blockWidth === codeBlockMinWidth) {
-        className = this.chooseRandomString(['parenthesis']);
-        break;
-      }
-
-      if (blockWidth === codeBlockMaxWidth) {
-        className = this.chooseRandomString(['comment', 'function']);
-        continue;
-      }
-
-      className = this.chooseRandomString([
-        'access-modifier',
-        'primitive-type',
-        'conditional-statement',
-        'jump-statement',
-        'variable-declaration-const',
-        'variable-declaration-let',
-      ]);
-
+      const randomVariation =
+        Math.floor(Math.random() * styleVariationsCount) + 1;
+      className = `block-width-${Math.floor(
+        blockWidth / this.codeBlockMinWidth
+      )} block-variation-${randomVariation}`;
       continue;
     } while (this.previousClassName === className);
     this.previousClassName = className;
     return className;
-  }
-
-  private chooseRandomString(strings: string[]): string {
-    const randomIndex = Math.floor(Math.random() * strings.length);
-    return strings[randomIndex];
   }
 
   private createRandomBlockWidths(
@@ -340,17 +319,25 @@ export default class Blocks {
 
     const numbers: number[] = [];
     let remainingSum = sum;
-
+    let previousRandomNumber = 0;
     while (remainingSum > codeBlockMinWidth) {
-      const randomNumber = this.generateRandomNumber(
-        availableWidths,
-        codeBlockMinWidth,
-        codeBlockMaxWidth
+      let randomNumber = 0;
+      do {
+        randomNumber = this.generateRandomNumber(
+          availableWidths,
+          codeBlockMinWidth,
+          codeBlockMaxWidth
+        );
+      } while (
+        randomNumber === previousRandomNumber ||
+        randomNumber > remainingSum
       );
+      previousRandomNumber = randomNumber;
 
       numbers.push(randomNumber);
       remainingSum -= randomNumber;
     }
+
     return numbers;
   }
 
