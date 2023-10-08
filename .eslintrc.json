@@ -3,7 +3,7 @@
   "ignorePatterns": [],
   "overrides": [
     {
-      "files": ["*.ts"],
+      "files": ["src/**/*.ts"],
       "parserOptions": {
         "project": true,
         "createDefaultProgram": true
