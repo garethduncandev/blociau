@@ -1,6 +1,6 @@
 {
   "name": "@garethduncandev/blocks",
-  "version": "1.0.0",
+  "version": "1.0.3",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -26,11 +26,11 @@
   },
   "main": "./dist/blocks.umd.cjs",
   "module": "./dist/blocks.js",
-  "types": "./dist/index.d.ts",
+  "types": "./dist/blocks.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/index.js",
-      "require": "./dist/index.umd.js"
+      "import": "./dist/blocks.js",
+      "require": "./dist/blocks.umd.js"
     }
   },
   "files": [
