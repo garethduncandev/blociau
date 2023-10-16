@@ -118,8 +118,7 @@ export default class Blocks {
     );
 
     // create svg elements
-    const svgRowColumnElements = this.createSvgElements(columns);
-    return svgRowColumnElements;
+    return this.createSvgElements(columns);
   }
 
   private splitRowIntoColumns(
@@ -130,7 +129,7 @@ export default class Blocks {
     let startX = 0;
     const columns: Column[] = [];
     for (let x = 0; x < columnsCount; x++) {
-      const pixelsContainColor = this.areaContainsColour(
+      const whiteOrTransparent = this.whiteOrTransparent(
         context,
         startX,
         startY,
@@ -141,7 +140,7 @@ export default class Blocks {
       columns.push({
         startX,
         startY,
-        fill: pixelsContainColor,
+        fill: !whiteOrTransparent,
         blockWidth: this.codeBlockMinWidth,
       });
       startX += this.codeBlockMinWidth;
@@ -176,7 +175,7 @@ export default class Blocks {
       }
     }
 
-    return mergedColumns;
+    return mergedColumns.filter((x) => x.fill);
   }
 
   private splitColumnsIntoRandomLengthColumns(
@@ -187,7 +186,8 @@ export default class Blocks {
     const result: Column[] = [];
     for (let x = 0; x < columns.length; x++) {
       const blockWidth = columns[x].blockWidth;
-      const newBlockWidths = this.createRandomBlockWidths(
+
+      const newBlockWidths = this.splitNumberIntoRandomNonRepeatingArray(
         blockWidth,
         codeBlockMinWidth,
         codeBlockMaxWidth
@@ -212,7 +212,7 @@ export default class Blocks {
     return result;
   }
 
-  private areaContainsColour(
+  private whiteOrTransparent(
     context: CanvasRenderingContext2D,
     startX: number,
     startY: number,
@@ -226,7 +226,7 @@ export default class Blocks {
       1
     ).data;
 
-    let notWhiteOrTransparent = false;
+    let whiteOrTransparent = true;
     for (let i = 0; i < pixelData.length; i += 4) {
       const red = pixelData[i];
       const green = pixelData[i + 1];
@@ -238,12 +238,13 @@ export default class Blocks {
         continue;
       }
 
+      // if any color, then it's not white or transparent
       if (red < 255 || green < 255 || blue < 255) {
-        notWhiteOrTransparent = true;
+        whiteOrTransparent = false;
         break;
       }
     }
-    return notWhiteOrTransparent;
+    return whiteOrTransparent;
   }
 
   private createSvgElements(columns: Column[]): SVGRectElement[] {
@@ -306,54 +307,67 @@ export default class Blocks {
     return className;
   }
 
-  private createRandomBlockWidths(
+  private splitNumberIntoRandomNonRepeatingArray(
     sum: number,
-    codeBlockMinWidth: number,
-    codeBlockMaxWidth: number
+    min: number,
+    max: number
   ): number[] {
-    const numberOfBlocks = Math.floor(sum / codeBlockMinWidth);
+    const maxArrayLength = Math.floor(sum / min);
 
-    const availableWidths = Array.from(Array(numberOfBlocks).keys()).map(
-      (m) => m * codeBlockMinWidth
-    );
+    const allPossibleValues = Array.from(Array(maxArrayLength).keys())
+      .map((m) => (m + 1) * min)
+      .filter((x) => x <= max);
 
-    const numbers: number[] = [];
     let remainingSum = sum;
-    let previousRandomNumber = 0;
-    while (remainingSum > codeBlockMinWidth) {
-      let randomNumber = 0;
-      do {
-        randomNumber = this.generateRandomNumber(
-          availableWidths,
-          codeBlockMinWidth,
-          codeBlockMaxWidth
-        );
-      } while (
-        randomNumber === previousRandomNumber ||
-        randomNumber > remainingSum
+    const result: number[] = [];
+    while (remainingSum > 0) {
+      const remainingPossibleValues = this.calculateRemainingPossibleValues(
+        result,
+        allPossibleValues,
+        remainingSum,
+        min
       );
-      previousRandomNumber = randomNumber;
 
-      numbers.push(randomNumber);
+      const randomIndex = Math.floor(
+        Math.random() * remainingPossibleValues.length
+      );
+      const randomNumber = remainingPossibleValues[randomIndex];
+
+      result.push(randomNumber);
       remainingSum -= randomNumber;
     }
 
-    return numbers;
+    return result;
   }
 
-  private generateRandomNumber(
-    availableWidths: number[],
-    codeBlockMinWidth: number,
-    codeBlockMaxWidth: number
-  ): number {
-    let randomNumber: number;
-    do {
-      const randomIndex = Math.floor(Math.random() * availableWidths.length);
-      randomNumber = availableWidths[randomIndex];
-    } while (
-      randomNumber < codeBlockMinWidth ||
-      randomNumber > codeBlockMaxWidth
-    );
-    return randomNumber;
+  private calculateRemainingPossibleValues(
+    currentResult: number[],
+    allPossibleValues: number[],
+    remainingSum: number,
+    min: number
+  ): number[] {
+    // Create new possible remaining values:
+    // 1. If we have no result yet, all values are possible
+    // 2. If possible values length is 1, then we use the existing possible values
+    // 3. If remaining sum equals min value, then we use the existing possible values
+    // 4. If 1 and 2 are not true then we
+    // 5. a) filter out the previous value
+    // 6. b) filter out all values that are larger than the remaining sum
+
+    if (currentResult.length === 0) {
+      return allPossibleValues;
+    }
+
+    if (allPossibleValues.length === 1) {
+      return allPossibleValues;
+    }
+
+    if (remainingSum === min) {
+      return [min];
+    }
+
+    return allPossibleValues
+      .filter((x) => x !== currentResult[currentResult.length - 1])
+      .filter((x) => x <= remainingSum);
   }
 }
