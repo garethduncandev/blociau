@@ -2,16 +2,35 @@ import Blocks from './src/blocks';
 
 const codeBlockHeight = 10;
 const codeBlockMinWidth = codeBlockHeight;
-const codeBlockMaxWidth = codeBlockMinWidth * 3;
 const padding = codeBlockHeight / 4;
-const numberStyleVariations = 3;
+const b: { width: number; color: string }[] = [];
 
 const blocks = new Blocks(
   codeBlockHeight,
-  codeBlockMinWidth,
-  codeBlockMaxWidth,
-  padding,
-  numberStyleVariations
+  [
+    {
+      width: codeBlockMinWidth,
+      color: 'red',
+    },
+    {
+      width: codeBlockMinWidth,
+      color: 'blue',
+    },
+    {
+      width: codeBlockMinWidth * 2,
+      color: 'yellow',
+    },
+    {
+      width: codeBlockMinWidth * 3,
+      color: 'green',
+    },
+    {
+      width: codeBlockMinWidth * 3,
+      color: 'purple',
+    },
+  ],
+
+  padding
 );
 
 const img = document.getElementById('input') as HTMLImageElement;

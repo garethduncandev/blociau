@@ -4,13 +4,16 @@ import { createContext, isWhiteOrTransparent } from './helpers/canvas';
 import { createEmptySVGElement, createSvgElements } from './helpers/svg';
 
 export default class Blocks {
+  private codeBlockMinWidth: number = 0;
+  private codeBlockMaxWidth: number = 0;
   public constructor(
     private blockHeight: number,
-    private codeBlockMinWidth: number,
-    private codeBlockMaxWidth: number,
-    private padding: number,
-    private styleVariationsCount: number
-  ) {}
+    private blockStyles: { width: number; color: string }[],
+    private padding: number
+  ) {
+    this.codeBlockMinWidth = Math.min(...this.blockStyles.map((x) => x.width));
+    this.codeBlockMaxWidth = Math.max(...this.blockStyles.map((x) => x.width));
+  }
 
   public create(id: string, image: HTMLImageElement): SVGSVGElement {
     const context = createContext(image.width, image.height);
@@ -18,7 +21,7 @@ export default class Blocks {
     const rowsCount = image.height / this.blockHeight;
     const columnsCount = image.width / this.codeBlockMinWidth;
 
-    const result = this.createBlocks(
+    const result = this.createSVGRectElements(
       context,
       rowsCount,
       columnsCount,
@@ -33,7 +36,7 @@ export default class Blocks {
     return outputSvg;
   }
 
-  private createBlocks(
+  private createSVGRectElements(
     context: CanvasRenderingContext2D,
     rowsCount: number,
     columnsCount: number,
@@ -85,9 +88,8 @@ export default class Blocks {
     return createSvgElements(
       columns,
       this.blockHeight,
-      codeBlockMinWidth,
-      this.padding,
-      this.styleVariationsCount
+      this.blockStyles,
+      this.padding
     );
   }
 

@@ -1,3 +1,4 @@
+import { BlockStyle } from '../blockStyle';
 import { Column } from '../column';
 
 export function createEmptySVGElement(
@@ -18,25 +19,23 @@ export function createEmptySVGElement(
 export function createSvgElements(
   columns: Column[],
   blockHeight: number,
-  minCodeBlockWidth: number,
-  padding: number,
-  styleVariationsCount: number
+  blockStyles: BlockStyle[],
+  padding: number
 ): SVGRectElement[] {
   const rectangles: SVGRectElement[] = [];
 
-  let previousClassName: string | undefined = undefined;
+  let previousBlockStyle: BlockStyle | undefined = undefined;
   for (let x = 0; x < columns.length; x++) {
     const rect = createRectangle(
       columns[x].startX,
       columns[x].startY,
       columns[x].blockWidth,
       blockHeight,
-      minCodeBlockWidth,
-      styleVariationsCount,
+      blockStyles,
       padding,
-      previousClassName
+      previousBlockStyle
     );
-    previousClassName = rect.className;
+    previousBlockStyle = rect.blockStyle;
     rectangles.push(rect.svgElement);
   }
 
@@ -48,43 +47,52 @@ function createRectangle(
   startY: number,
   codeBlockWidth: number,
   codeBlockHeight: number,
-  minCodeBlockWidth: number,
-  styleVariationsCount: number,
+  blockStyles: BlockStyle[],
   padding: number,
-  previousClassName: string | undefined
-): { svgElement: SVGRectElement; className: string } {
+  previousBlockStyle: BlockStyle | undefined
+): { svgElement: SVGRectElement; blockStyle: BlockStyle } {
   const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
   rect.setAttribute('width', (codeBlockWidth - padding).toString());
   rect.setAttribute('height', (codeBlockHeight - padding).toString());
   rect.setAttribute('x', startX.toString());
   rect.setAttribute('y', startY.toString());
 
-  const className = calculateRectClassName(
+  blockStyles = blockStyles.filter((x) => x.width === codeBlockWidth);
+
+  const blockStyle = calculateBlockStyle(
     codeBlockWidth,
-    minCodeBlockWidth,
-    previousClassName,
-    styleVariationsCount
+    blockStyles,
+    previousBlockStyle
   );
+
+  const className = `block-width-${blockStyle.width} block-index-${
+    blockStyles.indexOf(blockStyle) + 1
+  }`;
+
+  rect.style.fill = blockStyle.color;
   rect.setAttribute('class', className);
 
-  return { svgElement: rect, className };
+  return { svgElement: rect, blockStyle: blockStyle };
 }
 
-function calculateRectClassName(
+function calculateBlockStyle(
   blockWidth: number,
-  minWidth: number,
-  previousClassName: string | undefined,
-  styleVariationsCount: number
-): string {
-  let className: string = '';
+  blockStyles: BlockStyle[],
+  previousBlockStyle: BlockStyle | undefined
+): BlockStyle {
+  let blockStyle: BlockStyle | undefined = undefined;
+  //const minWidth = Math.min(...blockStyles.map((x) => x.width));
+
+  // focus on block styles that have the same width as the current block
+  blockStyles = blockStyles.filter((x) => x.width === blockWidth);
+
+  const blockStylesCount = blockStyles.length;
 
   do {
-    const randomVariation =
-      Math.floor(Math.random() * styleVariationsCount) + 1;
-    className = `block-width-${Math.floor(
-      blockWidth / minWidth
-    )} block-variation-${randomVariation}`;
+    const randomVariation = Math.floor(Math.random() * blockStylesCount) + 1;
+    blockStyle = blockStyles[randomVariation - 1];
+
     continue;
-  } while (previousClassName === className);
-  return className;
+  } while (previousBlockStyle === blockStyle && blockStylesCount > 1);
+  return blockStyle;
 }
