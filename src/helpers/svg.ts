@@ -64,6 +64,7 @@ function createRectangle(
     blockStyles,
     previousBlockStyle
   );
+  rect.setAttribute('rx', blockStyle.borderRadius.toString());
 
   const className = `block-width-${blockStyle.width} block-index-${
     blockStyles.indexOf(blockStyle) + 1

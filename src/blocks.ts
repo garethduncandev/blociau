@@ -1,3 +1,4 @@
+import { BlockStyle } from './blockStyle';
 import { Column } from './column';
 import { splitNumberIntoRandomNonRepeatingArray } from './helpers/arrays';
 import { createContext, isWhiteOrTransparent } from './helpers/canvas';
@@ -8,7 +9,7 @@ export default class Blocks {
   private codeBlockMaxWidth: number = 0;
   public constructor(
     private blockHeight: number,
-    private blockStyles: { width: number; color: string }[],
+    private blockStyles: BlockStyle[],
     private padding: number
   ) {
     this.codeBlockMinWidth = Math.min(...this.blockStyles.map((x) => x.width));
