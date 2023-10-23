@@ -13,6 +13,8 @@ export default class Blocks {
     private blockStyles: BlockStyle[],
     private padding: number
   ) {
+    this.padding = Math.ceil(padding);
+
     this.codeBlockMinWidth = Math.min(...this.blockStyles.map((x) => x.width));
     this.codeBlockMaxWidth = Math.max(...this.blockStyles.map((x) => x.width));
   }

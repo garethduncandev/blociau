@@ -82,7 +82,6 @@ function calculateBlockStyle(
   previousBlockStyle: BlockStyle | undefined
 ): BlockStyle {
   let blockStyle: BlockStyle | undefined = undefined;
-  //const minWidth = Math.min(...blockStyles.map((x) => x.width));
 
   // focus on block styles that have the same width as the current block
   blockStyles = blockStyles.filter((x) => x.width === blockWidth);
