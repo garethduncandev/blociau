@@ -3,7 +3,7 @@ import Blocks from './src/blocks';
 
 const codeBlockHeight = 20;
 const codeBlockMinWidth = codeBlockHeight;
-const padding = codeBlockHeight / 4;
+const padding = codeBlockHeight / 3;
 const borderRadius = 2;
 const blockStyles: BlockStyle[] = [
   {
