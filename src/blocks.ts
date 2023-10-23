@@ -1,5 +1,6 @@
 import { BlockStyle } from './blockStyle';
 import { Column } from './column';
+import { animate } from './helpers/animate';
 import { splitNumberIntoRandomNonRepeatingArray } from './helpers/arrays';
 import { createContext, isWhiteOrTransparent } from './helpers/canvas';
 import { createEmptySVGElement, createSvgElements } from './helpers/svg';
@@ -16,6 +17,12 @@ export default class Blocks {
     this.codeBlockMaxWidth = Math.max(...this.blockStyles.map((x) => x.width));
   }
 
+  /**
+   * Creates an SVG element with code block rectangles based on the provided image.
+   * @param id - The ID of the SVG element to create.
+   * @param image - The image to use as the source for the code block rectangles.
+   * @returns The created SVG element with code block rectangles.
+   */
   public create(id: string, image: HTMLImageElement): SVGSVGElement {
     const context = createContext(image.width, image.height);
     context.drawImage(image, 0, 0);
@@ -35,6 +42,17 @@ export default class Blocks {
     outputSvg.getElementById(`${id}-code-blocks-group`)?.append(...result);
 
     return outputSvg;
+  }
+
+  /**
+   * Animates the specified SVG element with the given ID using the provided speed.
+   *
+   * @param id - The ID of the SVG element to animate.
+   * @param svg - The SVG element to animate.
+   * @param speed - The speed at which to animate the SVG element.
+   */
+  public animate(id: string, svg: SVGSVGElement, speed: number): void {
+    return animate(id, svg, this.padding, this.codeBlockMinWidth, speed);
   }
 
   private createSVGRectElements(
