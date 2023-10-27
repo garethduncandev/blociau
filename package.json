@@ -1,6 +1,6 @@
 {
-  "name": "@garethduncandev/blocks",
-  "version": "2.0.1",
+  "name": "@garethduncandev/blociau",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -13,7 +13,7 @@
     "format": "npm run prettier && npm run lint",
     "format:write": "npm run prettier:write && npm run lint:write",
     "prepublish": "npm run build",
-    "publish": "npm publish --userconfig ~/.npmrc-garethduncandev",
+    "publish": "npm publish --access public --userconfig ~/.npmrc-garethduncandev",
     "whoami": "npm whoami --userconfig ~/.npmrc-garethduncandev"
   },
   "devDependencies": {
@@ -25,13 +25,13 @@
     "vite": "^4.4.5",
     "vite-plugin-dts": "^3.6.0"
   },
-  "main": "./dist/blocks.umd.cjs",
-  "module": "./dist/blocks.js",
+  "main": "./dist/blociau.umd.cjs",
+  "module": "./dist/blociau.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/blocks.js",
-      "require": "./dist/blocks.umd.js"
+      "import": "./dist/blociau.js",
+      "require": "./dist/blociau.umd.js"
     }
   },
   "files": [
