@@ -2,9 +2,12 @@ name: Build Blockiau
 on:
   push:
     branches: ['main']
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    permissions: write-all # This is needed to create a new git tag
+
     steps:
       - uses: actions/checkout@v4
       # Setup .npmrc file to publish to npm
@@ -14,7 +17,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm run build
-      - name: Check if package.json version is newer
+      - name: Create git tag if package.json is newer than latest git tag
         run: |
           if [ "$(git tag --points-at HEAD)" = "" ] || [ "$(git describe --tags --abbrev=0)" != "$(git tag --points-at HEAD)" ]; then
             echo "Creating new git tag"
