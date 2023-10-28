@@ -14,3 +14,12 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm run build
+      - name: Check if package.json version is newer
+        run: |
+          if [ "$(git tag --points-at HEAD)" = "" ] || [ "$(git describe --tags --abbrev=0)" != "$(git tag --points-at HEAD)" ]; then
+            echo "Creating new git tag"
+            git tag v$(node -p "require('./package.json').version")
+            git push origin v$(node -p "require('./package.json').version")
+          else
+            echo "No new git tag needed"
+          fi
