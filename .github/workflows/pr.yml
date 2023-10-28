@@ -17,7 +17,7 @@ jobs:
       - run: npm run build
       - name: Check if package.json version is listed in git tags
         run: |
-          if git tag --list | grep -q v$(jq -r '.version' package.json); then
-            echo "Error: package.json version is already listed in git tags"
+          if git tag --list | grep -q "v$(jq -r '.version' package.json)"; then
+            echo "Error: package.json version v$(jq -r '.version' package.json) is already listed in git tags"
             exit 1
           fi
