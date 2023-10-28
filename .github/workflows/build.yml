@@ -17,8 +17,3 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
       - run: npm ci
       - run: npm run build
-      - name: Create git tag using package.json version
-        run: |
-          echo "Creating new git tag"
-          git tag v$(node -p "require('./package.json').version")
-          git push origin v$(node -p "require('./package.json').version")
