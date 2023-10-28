@@ -12,7 +12,6 @@
     "lint:write": "eslint . --fix",
     "format": "npm run prettier && npm run lint",
     "format:write": "npm run prettier:write && npm run lint:write",
-    "prepublish": "npm run build",
     "deploy": "npm publish --access public",
     "deploy:locally": "npm publish --access public --userconfig ~/.npmrc-garethduncandev",
     "whoami": "npm whoami --userconfig ~/.npmrc-garethduncandev"
