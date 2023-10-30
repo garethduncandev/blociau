@@ -1,6 +1,6 @@
 {
   "name": "blociau",
-  "version": "1.0.6",
+  "version": "1.0.4",
   "type": "module",
   "homepage": "https://github.com/garethduncandev/blociau#readme",
   "repository": {
@@ -28,7 +28,8 @@
     "prettier": "^3.0.3",
     "typescript": "^5.0.2",
     "vite": "^4.4.5",
-    "vite-plugin-dts": "^3.6.0"
+    "vite-plugin-dts": "^3.6.0",
+    "vitest": "^0.34.6"
   },
   "main": "./dist/blociau.umd.cjs",
   "module": "./dist/blociau.js",

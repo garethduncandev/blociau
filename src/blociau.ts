@@ -5,7 +5,7 @@ import { splitNumberIntoRandomNonRepeatingArray } from './helpers/arrays';
 import { createContext, isWhiteOrTransparent } from './helpers/canvas';
 import { createEmptySVGElement, createSvgElements } from './helpers/svg';
 
-export default class Blocks {
+export default class Blociau {
   private codeBlockMinWidth: number = 0;
   private codeBlockMaxWidth: number = 0;
   public constructor(
