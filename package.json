@@ -1,7 +1,12 @@
 {
-  "name": "@garethduncandev/blociau",
-  "version": "1.0.5",
+  "name": "blociau",
+  "version": "1.0.6",
   "type": "module",
+  "homepage": "https://github.com/garethduncandev/blociau#readme",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/garethduncandev/blociau.git"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
