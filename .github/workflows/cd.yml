@@ -35,7 +35,6 @@ jobs:
           VERSION=${{ steps.extract_version.outputs.VERSION }}
           if npm view blociau@$VERSION > /dev/null; then
             echo "Version $VERSION exists in npm registry"
-            echo "::set-output name=version_exists::true"
             exit 1
           fi
 
