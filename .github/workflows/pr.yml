@@ -15,8 +15,20 @@ jobs:
       - run: npm ci
       - run: npm run format
       - run: npm run build
-      - name: Check if package.json version is listed in git tags
+
+      - name: Extract version from package.json
+        id: extract_version
+        run: echo ::set-output name=VERSION::$(node -p "require('./package.json').version")
+
+      - name: Check if package.json version is listed in npm registry
+        id: check_npm_version
         run: |
-          git fetch --tags
-          VERSION=$(node -p "require('./package.json').version")
-          git show-ref --tags --verify --quiet -- "refs/tags/v$VERSION" && echo "Version v$VERSION exists" && exit 1 || echo "Version v$VERSION allowed"
+          VERSION=${{ steps.extract_version.outputs.VERSION }}
+          if npm view blociau@$VERSION > /dev/null; then
+            echo "Version $VERSION exists in npm registry"
+            echo "::set-output name=version_exists::true"
+            exit 1
+          else
+            echo "Version $VERSION not found in npm registry"
+            echo "::set-output name=version_exists::false"
+          fi

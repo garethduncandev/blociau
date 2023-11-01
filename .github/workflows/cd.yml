@@ -1,0 +1,57 @@
+name: Build Blociau
+on:
+  push:
+    branches: ['main']
+
+jobs:
+  cd:
+    name: Build, test and publish Blociau
+    runs-on: ubuntu-latest
+    permissions: write-all # This is needed to create a new git tag
+
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+          registry-url: 'https://registry.npmjs.org'
+      - run: npm ci
+      - run: npm run build
+      # todo - run: npm run test
+
+      - name: Build Changelog
+        id: github_release
+        uses: mikepenz/release-changelog-builder-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version from package.json
+        id: extract_version
+        run: echo ::set-output name=VERSION::$(node -p "require('./package.json').version")
+
+      - name: Check if package.json version is listed in npm registry
+        id: check_npm_version
+        run: |
+          VERSION=${{ steps.extract_version.outputs.VERSION }}
+          if npm view blociau@$VERSION > /dev/null; then
+            echo "Version $VERSION exists in npm registry"
+            echo "::set-output name=version_exists::true"
+            exit 1
+          fi
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.extract_version.outputs.VERSION }}
+          release_name: v${{ steps.extract_version.outputs.VERSION }}
+          body: ${{steps.github_release.outputs.changelog}}
+          draft: false
+          prerelease: false
+
+      - run: npm run deploy
+        name: Deploy to NPM
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
