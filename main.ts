@@ -1,10 +1,11 @@
 import { BlockStyle } from './src/blockStyle';
-import Blocks from './src/blocks';
+import Blociau from './src/Blociau';
 
 const codeBlockHeight = 20;
 const codeBlockMinWidth = codeBlockHeight;
 const padding = codeBlockHeight / 3;
 const borderRadius = 2;
+const delay = 1000;
 const blockStyles: BlockStyle[] = [
   {
     width: codeBlockMinWidth,
@@ -33,12 +34,18 @@ const blockStyles: BlockStyle[] = [
   },
 ];
 
-const blocks = new Blocks(codeBlockHeight, blockStyles, padding);
+const blocks = new Blociau(codeBlockHeight, blockStyles, padding);
 
 const img = document.getElementById('input') as HTMLImageElement;
 const output = document.getElementById('output');
 const svg = blocks.create('circle', img);
 
-blocks.animate('circle', svg, 0.2);
+const animateCss = blocks.animate('circle', svg, 0.2, delay);
+const style =
+  document.querySelector('style') || document.createElement('style');
+document.head.appendChild(style);
+animateCss.cssRules.forEach((cssRule) => {
+  style.sheet?.insertRule(cssRule, style.sheet.cssRules.length);
+});
 
 output?.appendChild(svg);
