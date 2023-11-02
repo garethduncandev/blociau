@@ -1,15 +1,25 @@
+import { AnimationCss } from './animate-css';
+
+/**
+ * Animates the typing of code blocks in an SVG element.
+ *
+ * @param id - The ID to use for the animation.
+ * @param svg - The SVG element containing the code blocks to animate.
+ * @param padding - The padding to add to each code block.
+ * @param codeBlockMinWidth - The minimum width of each code block.
+ * @param speed - The speed of the animation.
+ * @param delay - The delay before the animation starts.
+ * @returns An instance of the AnimateCss class.
+ */
 export function animate(
   id: string,
   svg: SVGSVGElement,
   padding: number,
   codeBlockMinWidth: number,
-  speed: number
-): void {
-  const style =
-    document.querySelector('style') || document.createElement('style');
-  document.head.appendChild(style);
-
-  const keyframesTyping = `
+  speed: number,
+  delay: number
+): AnimationCss {
+  const keyframesTypingCssRule = `
         @keyframes ${id}-typing {
             from {
                 width: 0;
@@ -20,11 +30,9 @@ export function animate(
         }
         `;
 
-  style.sheet?.insertRule(keyframesTyping, style.sheet.cssRules.length);
-
   const rects = svg.getElementsByTagName('rect');
 
-  let previousAnimationDuration = 0;
+  let previousAnimationDuration = delay;
   let previousRect: SVGRectElement | undefined = undefined;
 
   // random times to mimim random keystrokes
@@ -56,4 +64,6 @@ export function animate(
 
     previousRect = rect;
   }
+
+  return new AnimationCss([keyframesTypingCssRule]);
 }

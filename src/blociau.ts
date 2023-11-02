@@ -1,10 +1,14 @@
 import { BlockStyle } from './blockStyle';
 import { Column } from './column';
 import { animate } from './helpers/animate';
+import { AnimationCss } from './helpers/animate-css';
 import { splitNumberIntoRandomNonRepeatingArray } from './helpers/arrays';
 import { createContext, isWhiteOrTransparent } from './helpers/canvas';
 import { createEmptySVGElement, createSvgElements } from './helpers/svg';
 
+/**
+ * Represents a class for creating and animating code block rectangles based on an image.
+ */
 export default class Blociau {
   private codeBlockMinWidth: number = 0;
   private codeBlockMaxWidth: number = 0;
@@ -53,8 +57,21 @@ export default class Blociau {
    * @param svg - The SVG element to animate.
    * @param speed - The speed at which to animate the SVG element.
    */
-  public animate(id: string, svg: SVGSVGElement, speed: number): void {
-    return animate(id, svg, this.padding, this.codeBlockMinWidth, speed);
+  /**
+   * Animates a block with the given id using the provided SVG element, speed, and delay.
+   * @param id - The id of the block to animate.
+   * @param svg - The SVG element to use for the animation.
+   * @param speed - The speed of the animation in milliseconds.
+   * @param delay - The delay before the animation starts in milliseconds.
+   * @returns An AnimationCss object representing the animation.
+   */
+  public animate(
+    id: string,
+    svg: SVGSVGElement,
+    speed: number,
+    delay: number
+  ): AnimationCss {
+    return animate(id, svg, this.padding, this.codeBlockMinWidth, speed, delay);
   }
 
   private createSVGRectElements(
