@@ -1,4 +1,4 @@
-import { BlockStyle } from '../blockStyle';
+import { BlociauStyle } from '../blociau-style';
 import { Column } from '../column';
 
 export function createEmptySVGElement(
@@ -19,12 +19,12 @@ export function createEmptySVGElement(
 export function createSvgElements(
   columns: Column[],
   blockHeight: number,
-  blockStyles: BlockStyle[],
+  blockStyles: BlociauStyle[],
   padding: number
 ): SVGRectElement[] {
   const rectangles: SVGRectElement[] = [];
 
-  let previousBlockStyle: BlockStyle | undefined = undefined;
+  let previousBlockStyle: BlociauStyle | undefined = undefined;
   for (let x = 0; x < columns.length; x++) {
     const rect = createRectangle(
       columns[x].startX,
@@ -47,10 +47,10 @@ function createRectangle(
   startY: number,
   codeBlockWidth: number,
   codeBlockHeight: number,
-  blockStyles: BlockStyle[],
+  blockStyles: BlociauStyle[],
   padding: number,
-  previousBlockStyle: BlockStyle | undefined
-): { svgElement: SVGRectElement; blockStyle: BlockStyle } {
+  previousBlockStyle: BlociauStyle | undefined
+): { svgElement: SVGRectElement; blockStyle: BlociauStyle } {
   const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
   rect.setAttribute('width', (codeBlockWidth - padding).toString());
   rect.setAttribute('height', (codeBlockHeight - padding).toString());
@@ -78,10 +78,10 @@ function createRectangle(
 
 function calculateBlockStyle(
   blockWidth: number,
-  blockStyles: BlockStyle[],
-  previousBlockStyle: BlockStyle | undefined
-): BlockStyle {
-  let blockStyle: BlockStyle | undefined = undefined;
+  blockStyles: BlociauStyle[],
+  previousBlockStyle: BlociauStyle | undefined
+): BlociauStyle {
+  let blockStyle: BlociauStyle | undefined = undefined;
 
   // focus on block styles that have the same width as the current block
   blockStyles = blockStyles.filter((x) => x.width === blockWidth);
