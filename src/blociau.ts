@@ -1,4 +1,4 @@
-import { BlockStyle } from './blockStyle';
+import { BlociauStyle } from '.';
 import { Column } from './column';
 import { animate } from './helpers/animate';
 import { AnimationCss } from './helpers/animate-css';
@@ -14,13 +14,17 @@ export default class Blociau {
   private codeBlockMaxWidth: number = 0;
   public constructor(
     private blockHeight: number,
-    private blockStyles: BlockStyle[],
+    private blociauStyles: BlociauStyle[],
     private padding: number
   ) {
     this.padding = Math.ceil(padding);
 
-    this.codeBlockMinWidth = Math.min(...this.blockStyles.map((x) => x.width));
-    this.codeBlockMaxWidth = Math.max(...this.blockStyles.map((x) => x.width));
+    this.codeBlockMinWidth = Math.min(
+      ...this.blociauStyles.map((x) => x.width)
+    );
+    this.codeBlockMaxWidth = Math.max(
+      ...this.blociauStyles.map((x) => x.width)
+    );
   }
 
   /**
@@ -126,7 +130,7 @@ export default class Blociau {
     return createSvgElements(
       columns,
       this.blockHeight,
-      this.blockStyles,
+      this.blociauStyles,
       this.padding
     );
   }

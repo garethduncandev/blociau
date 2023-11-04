@@ -1,12 +1,12 @@
-import { BlockStyle } from './src/blockStyle';
-import Blociau from './src/Blociau';
+import { BlociauStyle } from './src/index';
+import Blociau from './src/index';
 
 const codeBlockHeight = 20;
 const codeBlockMinWidth = codeBlockHeight;
 const padding = codeBlockHeight / 3;
 const borderRadius = 2;
 const delay = 1000;
-const blockStyles: BlockStyle[] = [
+const blockStyles: BlociauStyle[] = [
   {
     width: codeBlockMinWidth,
     color: 'black',

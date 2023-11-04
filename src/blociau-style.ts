@@ -1,4 +1,4 @@
-export interface BlockStyle {
+export interface BlociauStyle {
   width: number;
   color: string;
   borderRadius: number;
