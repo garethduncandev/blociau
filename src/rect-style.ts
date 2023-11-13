@@ -1,4 +1,4 @@
-export class BlociauStyle {
+export class RectStyle {
   public constructor(
     public width: number,
     public color: string,

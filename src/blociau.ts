@@ -1,4 +1,4 @@
-import { BlociauStyle } from './blociau-style';
+import { RectStyle } from './rect-style';
 import { Column } from './column';
 import { animate } from './helpers/animate';
 import { Animation } from './animation';
@@ -14,7 +14,7 @@ export default class Blociau {
   private codeBlockMaxWidth: number = 0;
   public constructor(
     private blockHeight: number,
-    private blociauStyles: BlociauStyle[],
+    private blociauStyles: RectStyle[],
     private padding: number
   ) {
     this.padding = Math.ceil(padding);
