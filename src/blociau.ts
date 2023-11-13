@@ -1,7 +1,7 @@
-import { BlociauStyle } from '.';
+import { BlociauStyle } from './blociau-style';
 import { Column } from './column';
 import { animate } from './helpers/animate';
-import { AnimationCss } from './helpers/animate-css';
+import { Animation } from './animation';
 import { splitNumberIntoRandomNonRepeatingArray } from './helpers/arrays';
 import { createContext, isWhiteOrTransparent } from './helpers/canvas';
 import { createEmptySVGElement, createSvgElements } from './helpers/svg';
@@ -55,13 +55,6 @@ export default class Blociau {
   }
 
   /**
-   * Animates the specified SVG element with the given ID using the provided speed.
-   *
-   * @param id - The ID of the SVG element to animate.
-   * @param svg - The SVG element to animate.
-   * @param speed - The speed at which to animate the SVG element.
-   */
-  /**
    * Animates a block with the given id using the provided SVG element, speed, and delay.
    * @param id - The id of the block to animate.
    * @param svg - The SVG element to use for the animation.
@@ -74,7 +67,7 @@ export default class Blociau {
     svg: SVGSVGElement,
     speed: number,
     delay: number
-  ): AnimationCss {
+  ): Animation {
     return animate(id, svg, this.padding, this.codeBlockMinWidth, speed, delay);
   }
 

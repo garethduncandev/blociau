@@ -1,5 +1,5 @@
 import { BlociauStyle } from './src/index';
-import Blociau from './src/index';
+import { Blociau } from './src/index';
 
 const codeBlockHeight = 20;
 const codeBlockMinWidth = codeBlockHeight;

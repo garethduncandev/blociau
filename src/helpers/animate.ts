@@ -1,4 +1,4 @@
-import { AnimationCss } from './animate-css';
+import { Animation } from './../animation';
 
 /**
  * Animates the typing of code blocks in an SVG element.
@@ -18,7 +18,7 @@ export function animate(
   codeBlockMinWidth: number,
   speed: number,
   delay: number
-): AnimationCss {
+): Animation {
   const keyframesTypingCssRule = `
         @keyframes ${id}-typing {
             from {
@@ -65,5 +65,5 @@ export function animate(
     previousRect = rect;
   }
 
-  return new AnimationCss([keyframesTypingCssRule]);
+  return new Animation([keyframesTypingCssRule]);
 }

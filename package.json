@@ -1,6 +1,6 @@
 {
   "name": "blociau",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "type": "module",
   "homepage": "https://github.com/garethduncandev/blociau#readme",
   "repository": {
@@ -31,13 +31,13 @@
     "vite-plugin-dts": "^3.6.0",
     "vitest": "^0.34.6"
   },
-  "main": "./dist/blociau.umd.cjs",
-  "module": "./dist/blociau.js",
+  "main": "./dist/index.umd.cjs",
+  "module": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
-      "import": "./dist/blociau.js",
-      "require": "./dist/blociau.umd.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.umd.js"
     }
   },
   "files": [

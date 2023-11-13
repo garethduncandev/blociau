@@ -1,3 +1,3 @@
-export class AnimationCss {
+export class Animation {
   public constructor(public cssRules: string[]) {}
 }

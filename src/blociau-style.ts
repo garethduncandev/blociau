@@ -1,5 +1,7 @@
-export interface BlociauStyle {
-  width: number;
-  color: string;
-  borderRadius: number;
+export class BlociauStyle {
+  public constructor(
+    public width: number,
+    public color: string,
+    public borderRadius: number
+  ) {}
 }
