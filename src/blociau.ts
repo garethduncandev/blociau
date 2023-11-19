@@ -31,7 +31,7 @@ export class Blociau {
    */
   public fromImage(id: string, image: HTMLImageElement): SVGSVGElement {
     const context = createContext(image.width, image.height);
-    context.drawImage(image, 0, 0);
+    context.drawImage(image, 0, 0, image.width, image.height);
     const rowsCount = image.height / this.blockHeight;
     const columnsCount = image.width / this.codeBlockMinWidth;
 
