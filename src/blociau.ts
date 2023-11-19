@@ -14,17 +14,13 @@ export default class Blociau {
   private codeBlockMaxWidth: number = 0;
   public constructor(
     private blockHeight: number,
-    private blociauStyles: RectStyle[],
+    private rectStyles: RectStyle[],
     private padding: number
   ) {
     this.padding = Math.ceil(padding);
 
-    this.codeBlockMinWidth = Math.min(
-      ...this.blociauStyles.map((x) => x.width)
-    );
-    this.codeBlockMaxWidth = Math.max(
-      ...this.blociauStyles.map((x) => x.width)
-    );
+    this.codeBlockMinWidth = Math.min(...this.rectStyles.map((x) => x.width));
+    this.codeBlockMaxWidth = Math.max(...this.rectStyles.map((x) => x.width));
   }
 
   /**
@@ -33,18 +29,28 @@ export default class Blociau {
    * @param image - The image to use as the source for the code block rectangles.
    * @returns The created SVG element with code block rectangles.
    */
-  public create(id: string, image: HTMLImageElement): SVGSVGElement {
+  public fromImage(id: string, image: HTMLImageElement): SVGSVGElement {
     const context = createContext(image.width, image.height);
     context.drawImage(image, 0, 0);
     const rowsCount = image.height / this.blockHeight;
     const columnsCount = image.width / this.codeBlockMinWidth;
 
-    const result = this.createSVGRectElements(
+    const rowsAndColumns = this.createColumnsFromImage(
       context,
       rowsCount,
       columnsCount,
       this.codeBlockMinWidth,
       this.codeBlockMaxWidth
+    );
+
+    // flatten rows and columns into a single array
+    const columns = rowsAndColumns.flatMap((x) => x);
+
+    const result = createSvgElements(
+      columns,
+      this.blockHeight,
+      this.rectStyles,
+      this.padding
     );
 
     const outputSvg = createEmptySVGElement(image.width, image.height, id);
@@ -53,6 +59,41 @@ export default class Blociau {
 
     return outputSvg;
   }
+
+  public fromDimensions(
+    id: string,
+    width: number,
+    height: number
+  ): SVGSVGElement {
+    const rowsAndColumns = this.createColumnsFromDimensions(
+      width,
+      height,
+      this.codeBlockMinWidth,
+      this.codeBlockMaxWidth
+    );
+
+    // flatten rows and columns into a single array
+    const columns = rowsAndColumns.flatMap((x) => x);
+
+    const result = createSvgElements(
+      columns,
+      this.blockHeight,
+      this.rectStyles,
+      this.padding
+    );
+
+    const outputSvg = createEmptySVGElement(width, height, id);
+
+    outputSvg.getElementById(`${id}-code-blocks-group`)?.append(...result);
+
+    return outputSvg;
+  }
+
+  // public fromDimensions(
+  //   id: string,
+  //   width: number,
+  //   height: number
+  // ): SVGSVGElement {}
 
   /**
    * Animates a block with the given id using the provided SVG element, speed, and delay.
@@ -71,42 +112,92 @@ export default class Blociau {
     return animate(id, svg, this.padding, this.codeBlockMinWidth, speed, delay);
   }
 
-  private createSVGRectElements(
+  private createColumnsFromDimensions(
+    width: number,
+    height: number,
+    codeBlockMinWidth: number,
+    codeBlockMaxWidth: number
+  ): Column[][] {
+    const rows: Column[][] = [];
+
+    const maxRows = Math.floor(height / this.blockHeight);
+
+    let startY = 0;
+    for (let y = 0; y < maxRows; y++) {
+      const columns = this.createRowColumnsFromDimensions(
+        width,
+        startY,
+        codeBlockMinWidth,
+        codeBlockMaxWidth
+      );
+
+      rows.push(columns);
+      startY += this.blockHeight;
+    }
+    return rows;
+  }
+
+  private createRowColumnsFromDimensions(
+    width: number,
+    startY: number,
+    codeBlockMinWidth: number,
+    codeBlockMaxWidth: number
+  ): Column[] {
+    const maxColumns = Math.floor(width / codeBlockMinWidth);
+    const columnWidth = maxColumns * codeBlockMinWidth;
+
+    const column: Column = {
+      fill: true,
+      startY: startY,
+      startX: 0,
+      blockWidth: columnWidth,
+    };
+
+    let columns: Column[] = [column];
+
+    // split columns into random length blocks for code effect
+    columns = this.splitColumnsIntoRandomLengthColumns(
+      columns,
+      codeBlockMinWidth,
+      codeBlockMaxWidth
+    );
+
+    return columns;
+  }
+
+  private createColumnsFromImage(
     context: CanvasRenderingContext2D,
     rowsCount: number,
     columnsCount: number,
     codeBlockMinWidth: number,
     codeBlockMaxWidth: number
-  ): SVGRectElement[] {
-    // work through each row
-    let startY = 0;
+  ): Column[][] {
+    const rows: Column[][] = [];
 
-    const svgElements: SVGRectElement[] = [];
-    // work through each column
+    let startY = 0;
     for (let y = 0; y < rowsCount; y++) {
-      // create svg elements
-      const svgRowColumnElements = this.createRowElements(
+      const columns = this.createRowColumnsFromImage(
         context,
         columnsCount,
         startY,
         codeBlockMinWidth,
         codeBlockMaxWidth
       );
-      svgElements.push(...svgRowColumnElements);
 
+      rows.push(columns);
       startY += this.blockHeight;
     }
-    return svgElements;
+    return rows;
   }
 
-  private createRowElements(
+  private createRowColumnsFromImage(
     context: CanvasRenderingContext2D,
     columnsCount: number,
     startY: number,
     codeBlockMinWidth: number,
     codeBlockMaxWidth: number
-  ): SVGRectElement[] {
-    let columns = this.calculateColumns(context, columnsCount, startY);
+  ): Column[] {
+    let columns = this.calculateColumnsFromImage(context, columnsCount, startY);
 
     // merge filled columns next to each other together
     // this allows us to calculate the min and max length to work with
@@ -119,16 +210,10 @@ export default class Blociau {
       codeBlockMaxWidth
     );
 
-    // create svg elements
-    return createSvgElements(
-      columns,
-      this.blockHeight,
-      this.blociauStyles,
-      this.padding
-    );
+    return columns;
   }
 
-  private calculateColumns(
+  private calculateColumnsFromImage(
     context: CanvasRenderingContext2D,
     columnsCount: number,
     startY: number
