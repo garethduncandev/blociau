@@ -1,15 +1,15 @@
-import { RectStyle } from './rect-style';
-import { Column } from './column';
-import { animate } from './helpers/animate';
-import { Animation } from './animation';
-import { splitNumberIntoRandomNonRepeatingArray } from './helpers/arrays';
-import { createContext, isWhiteOrTransparent } from './helpers/canvas';
-import { createEmptySVGElement, createSvgElements } from './helpers/svg';
+import { RectStyle } from './rect-style.js';
+import { Column } from './column.js';
+import { animate } from './helpers/animate.js';
+import { Animation } from './animation.js';
+import { splitNumberIntoRandomNonRepeatingArray } from './helpers/arrays.js';
+import { createContext, isWhiteOrTransparent } from './helpers/canvas.js';
+import { createEmptySVGElement, createSvgElements } from './helpers/svg.js';
 
 /**
  * Represents a class for creating and animating code block rectangles based on an image.
  */
-export default class Blociau {
+export class Blociau {
   private codeBlockMinWidth: number = 0;
   private codeBlockMaxWidth: number = 0;
   public constructor(
@@ -146,12 +146,7 @@ export default class Blociau {
     const maxColumns = Math.floor(width / codeBlockMinWidth);
     const columnWidth = maxColumns * codeBlockMinWidth;
 
-    const column: Column = {
-      fill: true,
-      startY: startY,
-      startX: 0,
-      blockWidth: columnWidth,
-    };
+    const column = new Column(0, startY, true, columnWidth);
 
     let columns: Column[] = [column];
 
@@ -290,12 +285,7 @@ export default class Blociau {
       for (let w = 0; w < newBlockWidths.length; w++) {
         const width = newBlockWidths[w];
 
-        const newColumn: Column = {
-          fill: true,
-          startY: columns[x].startY,
-          startX: newStartX,
-          blockWidth: width,
-        };
+        const newColumn = new Column(newStartX, columns[x].startY, true, width);
 
         newStartX += width;
         result.push(newColumn);

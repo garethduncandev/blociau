@@ -1,4 +1,4 @@
-import { Animation } from './../animation';
+import { Animation } from './../animation.js';
 
 /**
  * Animates the typing of code blocks in an SVG element.

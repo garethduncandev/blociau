@@ -1,5 +1,5 @@
-import { RectStyle } from '../rect-style';
-import { Column } from '../column';
+import { RectStyle } from '../rect-style.js';
+import { Column } from '../column.js';
 
 export function createEmptySVGElement(
   width: number,

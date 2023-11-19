@@ -1,6 +1,8 @@
-export interface Column {
-  startX: number;
-  startY: number;
-  fill: boolean;
-  blockWidth: number;
+export class Column {
+  public constructor(
+    public startX: number,
+    public startY: number,
+    public fill: boolean,
+    public blockWidth: number
+  ) {}
 }
