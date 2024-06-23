@@ -11,13 +11,17 @@ export function splitNumberIntoRandomNonRepeatingArray(
 
   let remainingSum = sum;
   const result: number[] = [];
-  while (remainingSum > 0) {
+  while (remainingSum > 0 && remainingSum >= min) {
     const remainingPossibleValues = calculateRemainingPossibleValues(
       result,
       allPossibleValues,
       remainingSum,
       min
     );
+
+    if (remainingPossibleValues.length === 0) {
+      break;
+    }
 
     const randomIndex = Math.floor(
       Math.random() * remainingPossibleValues.length

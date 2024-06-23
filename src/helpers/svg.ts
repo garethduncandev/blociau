@@ -42,7 +42,7 @@ export function createSvgElements(
   return rectangles;
 }
 
-function createRectangle(
+export function createRectangle(
   startX: number,
   startY: number,
   codeBlockWidth: number,

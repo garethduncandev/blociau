@@ -5,6 +5,7 @@ import { Animation } from './animation.js';
 import { splitNumberIntoRandomNonRepeatingArray } from './helpers/arrays.js';
 import { createContext, isWhiteOrTransparent } from './helpers/canvas.js';
 import { createEmptySVGElement, createSvgElements } from './helpers/svg.js';
+import { Continuous } from './continuous.js';
 
 /**
  * Represents a class for creating and animating code block rectangles based on an image.
@@ -29,7 +30,11 @@ export class Blociau {
    * @param image - The image to use as the source for the code block rectangles.
    * @returns The created SVG element with code block rectangles.
    */
-  public fromImage(id: string, image: HTMLImageElement): SVGSVGElement {
+  public fromImage(
+    id: string,
+    image: HTMLImageElement,
+    invert: boolean
+  ): SVGSVGElement {
     const context = createContext(image.width, image.height);
     context.drawImage(image, 0, 0, image.width, image.height);
     const rowsCount = image.height / this.blockHeight;
@@ -40,7 +45,8 @@ export class Blociau {
       rowsCount,
       columnsCount,
       this.codeBlockMinWidth,
-      this.codeBlockMaxWidth
+      this.codeBlockMaxWidth,
+      invert
     );
 
     // flatten rows and columns into a single array
@@ -60,6 +66,13 @@ export class Blociau {
     return outputSvg;
   }
 
+  /**
+   * Creates an SVG element with code block rectangles based on provided width and height.
+   * @param id - The ID of the SVG element to create.
+   * @param width - The width of the SVG element.
+   * @param height - The height of the SVG element.
+   * @returns The created SVG element with code block rectangles.
+   */
   public fromDimensions(
     id: string,
     width: number,
@@ -89,11 +102,30 @@ export class Blociau {
     return outputSvg;
   }
 
-  // public fromDimensions(
-  //   id: string,
-  //   width: number,
-  //   height: number
-  // ): SVGSVGElement {}
+  public continuos(
+    outputElementId: string,
+    width: number,
+    height: number
+  ): void {
+    const htmlElement = document.getElementById(outputElementId);
+
+    if (!htmlElement) {
+      throw new Error(`Element with id ${outputElementId} not found.`);
+    }
+
+    const continuous = new Continuous(
+      width,
+      height,
+      this.codeBlockMinWidth,
+      this.codeBlockMaxWidth,
+      this.blockHeight,
+      this.rectStyles,
+      this.padding,
+      htmlElement
+    );
+
+    continuous.start();
+  }
 
   /**
    * Animates a block with the given id using the provided SVG element, speed, and delay.
@@ -165,7 +197,8 @@ export class Blociau {
     rowsCount: number,
     columnsCount: number,
     codeBlockMinWidth: number,
-    codeBlockMaxWidth: number
+    codeBlockMaxWidth: number,
+    invert: boolean
   ): Column[][] {
     const rows: Column[][] = [];
 
@@ -176,7 +209,8 @@ export class Blociau {
         columnsCount,
         startY,
         codeBlockMinWidth,
-        codeBlockMaxWidth
+        codeBlockMaxWidth,
+        invert
       );
 
       rows.push(columns);
@@ -190,9 +224,15 @@ export class Blociau {
     columnsCount: number,
     startY: number,
     codeBlockMinWidth: number,
-    codeBlockMaxWidth: number
+    codeBlockMaxWidth: number,
+    invert: boolean
   ): Column[] {
-    let columns = this.calculateColumnsFromImage(context, columnsCount, startY);
+    let columns = this.calculateColumnsFromImage(
+      context,
+      columnsCount,
+      startY,
+      invert
+    );
 
     // merge filled columns next to each other together
     // this allows us to calculate the min and max length to work with
@@ -211,7 +251,8 @@ export class Blociau {
   private calculateColumnsFromImage(
     context: CanvasRenderingContext2D,
     columnsCount: number,
-    startY: number
+    startY: number,
+    invert: boolean
   ): Column[] {
     let startX = 0;
     const columns: Column[] = [];
@@ -224,10 +265,12 @@ export class Blociau {
         this.blockHeight
       );
 
+      const fill = invert ? whiteOrTransparent : !whiteOrTransparent;
+
       columns.push({
         startX,
         startY,
-        fill: !whiteOrTransparent,
+        fill: fill,
         blockWidth: this.codeBlockMinWidth,
       });
       startX += this.codeBlockMinWidth;

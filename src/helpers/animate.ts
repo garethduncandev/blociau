@@ -13,7 +13,7 @@ import { Animation } from './../animation.js';
  */
 export function animate(
   id: string,
-  svg: SVGSVGElement,
+  svg: SVGSVGElement | SVGRectElement[],
   padding: number,
   codeBlockMinWidth: number,
   speed: number,
@@ -30,12 +30,17 @@ export function animate(
         }
         `;
 
-  const rects = svg.getElementsByTagName('rect');
+  // if svg is an array of rectangles
+  if (svg instanceof SVGSVGElement) {
+  }
+
+  const rects =
+    svg instanceof SVGSVGElement ? svg.getElementsByTagName('rect') : svg;
 
   let previousAnimationDuration = delay;
   let previousRect: SVGRectElement | undefined = undefined;
 
-  // random times to mimim random keystrokes
+  // random times to mimic random keystrokes
   const keyStokeTimes = [1, 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233];
 
   for (let i = 0; i < rects.length; i++) {

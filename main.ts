@@ -36,41 +36,44 @@ const blockStyles: RectStyle[] = [
 
 const blocks = new Blociau(codeBlockHeight, blockStyles, padding);
 
-// blociau from image
-const img = document.getElementById('input') as HTMLImageElement;
-const output = document.getElementById('output-image');
-const svg = blocks.fromImage('circle', img);
+// // blociau from image
+// const img = document.getElementById('input') as HTMLImageElement;
+// const output = document.getElementById('output-image');
+// const svg = blocks.fromImage('circle', img, false);
 
-const animateCss = blocks.animate('circle', svg, 0.2, delay);
-const style =
-  document.querySelector('style') || document.createElement('style');
-document.head.appendChild(style);
-animateCss.cssRules.forEach((cssRule) => {
-  style.sheet?.insertRule(cssRule, style.sheet.cssRules.length);
-});
+// const animateCss = blocks.animate('circle', svg, 3, delay);
+// const style =
+//   document.querySelector('style') || document.createElement('style');
+// document.head.appendChild(style);
+// animateCss.cssRules.forEach((cssRule) => {
+//   style.sheet?.insertRule(cssRule, style.sheet.cssRules.length);
+// });
 
-output?.appendChild(svg);
+// output?.appendChild(svg);
 
-// blociau from dimensions
-const windowWidth = window.innerWidth;
-const height = 300;
-const outputDimensions = document.getElementById('output-dimensions');
-const svgDimensions = blocks.fromDimensions('circle', windowWidth, height);
+// // blociau from dimensions
+// const windowWidth = window.innerWidth;
+// const height = 300;
+// const outputDimensions = document.getElementById('output-dimensions');
+// const svgDimensions = blocks.fromDimensions('circle', windowWidth, height);
 
-const animateCssDimensions = blocks.animate(
-  'circle',
-  svgDimensions,
-  0.2,
-  delay
-);
-const styleDimensions =
-  document.querySelector('style') || document.createElement('style');
-document.head.appendChild(styleDimensions);
-animateCssDimensions.cssRules.forEach((cssRule) => {
-  styleDimensions.sheet?.insertRule(
-    cssRule,
-    styleDimensions.sheet.cssRules.length
-  );
-});
+// const animateCssDimensions = blocks.animate(
+//   'circle',
+//   svgDimensions,
+//   0.1,
+//   delay
+// );
+// const styleDimensions =
+//   document.querySelector('style') || document.createElement('style');
+// document.head.appendChild(styleDimensions);
+// animateCssDimensions.cssRules.forEach((cssRule) => {
+//   styleDimensions.sheet?.insertRule(
+//     cssRule,
+//     styleDimensions.sheet.cssRules.length
+//   );
+// });
 
-outputDimensions?.appendChild(svgDimensions);
+// outputDimensions?.appendChild(svgDimensions);
+
+// continue effect
+blocks.continuos('output-continuous', 200, 200);
