@@ -1,6 +1,6 @@
 {
   "name": "blociau",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "type": "module",
   "homepage": "https://github.com/garethduncandev/blociau#readme",
   "repository": {
@@ -31,5 +31,16 @@
     "storybook": "^8.2.9",
     "typescript": "^5.5.3",
     "vite": "^5.4.1"
-  }
+  },
+  "main": "./dist/index.js",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist"
+  ]
 }
