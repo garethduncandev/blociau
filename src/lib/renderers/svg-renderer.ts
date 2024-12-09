@@ -136,6 +136,7 @@ export class SvgRenderer implements Renderer {
     }
 
     path.setAttribute('fill', svgCharacter.color);
+
     const startX = renderedCharacterIndex * this.characterWidth;
     const startY = renderedRowIndex * this.characterHeight;
 
@@ -227,6 +228,8 @@ export class SvgRenderer implements Renderer {
 
         characterPath.setAttribute('d', attributeValue);
         characterPath.classList.add(`char-${rowIndex}-${charIndex}`);
+        characterPath.setAttribute('fill', 'transparent');
+
         paths.push(characterPath);
         startX += this.characterWidth;
       }

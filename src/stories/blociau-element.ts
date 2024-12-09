@@ -61,13 +61,13 @@ export class BlociauElement extends LitElement {
   }
 
   private async createBlociau(): Promise<Blociau> {
-    const image = await this.loadImg('vite.svg');
+    const image = await this.loadImg('dev.png');
 
     const blociau = new Blociau({
       canvasHeight: 32,
       canvasWidth: 32,
-      characterHeight: 2,
-      characterWidth: 2,
+      characterHeight: 11,
+      characterWidth: 11,
       padding: 0.1,
       borderRadius: 0.1,
       wordStyles: [

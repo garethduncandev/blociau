@@ -207,10 +207,6 @@ export class Blociau {
         )
       : 0;
 
-    // can't have more mistakes that what is available in the history
-
-    console.log(this.renderedGrid.rows);
-
     this.run();
   }
 
@@ -235,20 +231,8 @@ export class Blociau {
 
   // character delay in milliseconds
   private randomCharacterDelay(minDelay: number, maxDelay: number): number {
-    // Fibonacci sequence
-    const fibonacci = [1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233];
-
-    // Choose a random index from the Fibonacci sequence
-    const randomIndex = Math.floor(Math.random() * fibonacci.length);
-    const randomFibonacciValue = fibonacci[randomIndex];
-
-    // Scale the Fibonacci value to fit within the range 120 to 480
-    const scaledValue =
-      minDelay +
-      (randomFibonacciValue / fibonacci[fibonacci.length - 1]) *
-        (maxDelay - minDelay);
-
-    return Math.round(scaledValue);
+    // random number between min and max
+    return Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
   }
 
   private shouldRender(
