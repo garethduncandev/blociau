@@ -37,10 +37,8 @@ export class Blociau {
     let rowCharactersCount = 0;
 
     if (options.inputType === 'img' && options.image) {
-      rowsCount = Math.floor(options.image.height / options.characterHeight);
-      rowCharactersCount = Math.floor(
-        options.image.width / options.characterWidth
-      );
+      rowsCount = options.image.height / options.characterHeight;
+      rowCharactersCount = options.image.width / options.characterWidth;
     } else {
       rowsCount = options.canvasHeight / options.characterHeight;
       rowCharactersCount = options.canvasWidth / options.characterWidth;
@@ -123,11 +121,19 @@ export class Blociau {
     options: Options,
     maxCharactersPerRow: number
   ): Renderer {
+    let canvasWidth = options.canvasWidth;
+    let canvasHeight = options.canvasHeight;
+
+    if (options.inputType === 'img' && options.image) {
+      canvasWidth = options.image.width;
+      canvasHeight = options.image.height;
+    }
+
     switch (options.outputType) {
       case 'svg': {
         return new SvgRenderer(
-          options.canvasWidth,
-          options.canvasHeight,
+          canvasWidth,
+          canvasHeight,
           maxCharactersPerRow,
           options.characterWidth,
           options.characterHeight,
