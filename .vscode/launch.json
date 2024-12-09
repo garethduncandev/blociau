@@ -5,7 +5,7 @@
       "env": {
         "NO_COLOR": "true" // fixes serverReadyAction pattern matching
       },
-      "name": "Launch Vite DEV server",
+      "name": "Launch Vite DEV server - Edge",
       "request": "launch",
       "runtimeExecutable": "npm",
       "runtimeArgs": ["run", "dev"],

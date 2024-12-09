@@ -2,20 +2,13 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Vite + TS</title>
-    <script type="module" src="/main.ts"></script>
+    <title>Vite + Lit + TS</title>
+    <link rel="stylesheet" href="./src/index.css" />
+    <script type="module" src="/src/stories/blociau-element.ts"></script>
   </head>
   <body>
-    <img
-      id="input"
-      width="200"
-      height="200"
-      src="/assets/circle.png"
-      alt="circle"
-    />
-    <div id="output-image" style="width: 200px; height: 200px"></div>
-    <div id="output-dimensions"></div>
-    <div id="output-continuous"></div>
+    <blociau-element> </blociau-element>
   </body>
 </html>

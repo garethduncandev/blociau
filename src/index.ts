@@ -1,5 +1,2 @@
-import { RectStyle } from './rect-style.js';
-import { Animation } from './animation.js';
-import { Blociau } from './blociau.js';
-
-export { Blociau, RectStyle, Animation };
+export { Blociau } from './lib/blociau.js';
+export { Options } from './lib/models/options.js';
