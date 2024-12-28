@@ -1,4 +1,4 @@
-import { CanvasGrid, RenderedGrid, RenderedRow } from '../models/grid';
+import { CanvasGrid, RenderedRow } from '../models/grid';
 import { Renderer } from './renderer';
 
 export class SvgRenderer implements Renderer {
@@ -14,20 +14,50 @@ export class SvgRenderer implements Renderer {
     public borderRadius: number
   ) {}
 
-  public render(grid: CanvasGrid, renderedGrid: RenderedGrid): void {
+  public render(grid: CanvasGrid, renderedRows: RenderedRow[]): void {
     if (!this.svg) {
-      this.renderSvg(grid, this.outputElement);
+      this.svg = this.renderSvg(grid, this.outputElement);
     }
 
-    const paths = this.svg?.querySelectorAll<SVGPathElement>(`path`) ?? [];
+    const paths = this.svg.querySelectorAll<SVGPathElement>(`path`) ?? [];
+
+    const totalNumberOfRenderedCharacters =
+      this.totalNumberOfRenderedCharacters(renderedRows);
+
+    this.setPathsTransparent(paths, totalNumberOfRenderedCharacters);
 
     for (
       let renderedRowIndex = 0;
-      renderedRowIndex < renderedGrid.rows.length;
+      renderedRowIndex < renderedRows.length;
       renderedRowIndex++
     ) {
-      const renderedRow = renderedGrid.rows[renderedRowIndex];
+      const renderedRow = renderedRows[renderedRowIndex];
       this.renderRow(paths, grid, renderedRowIndex, renderedRow);
+    }
+  }
+
+  public destroy(): void {
+    this.svg?.remove();
+  }
+
+  private totalNumberOfRenderedCharacters(renderedRows: RenderedRow[]): number {
+    let total = 0;
+
+    for (const renderedRow of renderedRows) {
+      total += renderedRow.characters.length;
+    }
+    return total;
+  }
+
+  private setPathsTransparent(
+    paths: NodeListOf<SVGPathElement>,
+    startIndex: number
+  ): void {
+    for (let i = startIndex; i < paths.length; i++) {
+      const path = paths[i];
+      if (path.getAttribute('fill') !== 'transparent') {
+        path.setAttribute('fill', 'transparent');
+      }
     }
   }
 
@@ -164,7 +194,7 @@ export class SvgRenderer implements Renderer {
     // get the svg from the dom
 
     // render svg based on the grid and animated state
-    this.svg = this.createSvg(
+    const svg = this.createSvg(
       grid,
       this.canvasWidth,
       this.canvasHeight,
@@ -174,8 +204,9 @@ export class SvgRenderer implements Renderer {
     // get the output element from the dom
     if (outputElement) {
       outputElement.innerHTML = '';
-      outputElement.appendChild(this.svg);
+      outputElement.appendChild(svg);
     }
+    return svg;
   }
 
   private createSvg(
@@ -299,5 +330,8 @@ export class SvgRenderer implements Renderer {
   }
 }
 
-type SvgCharacter = { color: string; visible: boolean };
+interface SvgCharacter {
+  color: string;
+  visible: boolean;
+}
 type Border = 'left' | 'right' | 'both' | 'none';

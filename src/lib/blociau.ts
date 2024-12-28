@@ -4,7 +4,6 @@ import {
   CanvasCharacter,
   CanvasGrid,
   RenderedCharacter,
-  RenderedGrid,
   RenderedRow,
 } from './models/grid';
 import { Options, WordStyle } from './models/options';
@@ -13,26 +12,92 @@ import { SvgRenderer } from './renderers/svg-renderer';
 
 export class Blociau {
   private canvasGrid!: CanvasGrid;
-  public maxVisibleRows: number;
-  public maxCharactersPerRow: number;
-  private renderedGrid!: RenderedGrid;
-  private history: { renderedGrid: RenderedGrid; index: Index }[] = [];
+  private maxVisibleRows = 0;
+  private maxCharactersPerRow = 0;
+  private renderedRows: RenderedRow[] = [];
+  private history: { renderedRows: RenderedRow[]; index: Index }[] = [];
 
-  // render (e.g. cavas or svg)
   private renderer!: Renderer;
 
   // states, timestamps and indexes
   public runningState: RunningState = 'stopped';
-  public currentTimestamp = 0;
-  public lastRenderTimestamp = 0;
-
   public index: Index = { row: 0, character: 0 };
-
-  public characterDelay = 0;
-
   private mistakesCount = 0;
+  private currentWordColor: string | undefined = undefined;
+  private currentWordLength: number | undefined = undefined;
+  private currentWordIndex = 0;
+  private currentWordCharacterCount = 0;
 
-  public constructor(public options: Options) {
+  public constructor(public options: Options) {}
+
+  public async start(): Promise<void> {
+    await this.init();
+    this.runningState = 'running';
+    this.run(false);
+  }
+
+  public pause(): void {
+    this.runningState = 'paused';
+  }
+
+  public autoPause(): void {
+    this.runningState = 'autoPaused';
+  }
+
+  public resume(): void {
+    this.runningState = 'running';
+    this.run(true);
+  }
+
+  public stop(): void {
+    this.runningState = 'stopped';
+    if (this.renderer) {
+      // clear previous render
+      this.renderer.destroy();
+    }
+  }
+
+  private async init(): Promise<void> {
+    this.renderedRows = [];
+    this.history = [];
+    this.index = { row: 0, character: 0 };
+    this.validateOptions(this.options);
+    this.calculateRowsAndCharacterCount(this.options);
+
+    this.canvasGrid = await this.createCanvasGrid(this.options.inputType);
+    this.renderer = this.createRenderer(this.options, this.maxCharactersPerRow);
+
+    this.handleVisibilityChange();
+  }
+
+  private validateOptions(options: Options): void {
+    if (
+      options.minTypingDelayMilliseconds <= 0 ||
+      options.maxTypingDelayMilliseconds <= 0
+    ) {
+      throw new Error(
+        'minTypingDelayMilliseconds and maxTypingDelayMilliseconds must be greater than 0'
+      );
+    }
+  }
+
+  private handleVisibilityChange(): void {
+    document.removeEventListener('visibilitychange', () => undefined);
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        if (this.runningState === 'running') {
+          console.log('auto pausing');
+          this.autoPause();
+        }
+      } else {
+        if (this.runningState === 'autoPaused') {
+          this.resume();
+        }
+      }
+    });
+  }
+
+  private calculateRowsAndCharacterCount(options: Options): void {
     let rowsCount = 0;
     let rowCharactersCount = 0;
 
@@ -48,49 +113,6 @@ export class Blociau {
     this.maxCharactersPerRow = Math.floor(rowCharactersCount);
   }
 
-  public async start(): Promise<void> {
-    await this.init();
-    this.runningState = 'running';
-    this.run();
-  }
-
-  public pause(): void {
-    this.runningState = 'paused';
-  }
-
-  public resume(): void {
-    this.runningState = 'running';
-    this.run();
-  }
-
-  public stop(): void {
-    this.runningState = 'stopped';
-  }
-
-  private async init(): Promise<void> {
-    this.canvasGrid = await this.createCanvasGrid(this.options.inputType);
-    this.renderedGrid = this.createRenderedGrid();
-    this.renderer = this.createRenderer(this.options, this.maxCharactersPerRow);
-  }
-
-  private createRenderedGrid(): RenderedGrid {
-    const rows: RenderedRow[] = [];
-
-    for (let i = 0; i < this.maxVisibleRows; i++) {
-      const characters: RenderedCharacter[] = [];
-      for (let j = 0; j < this.maxCharactersPerRow; j++) {
-        characters.push({
-          rendered: false,
-          wordIndex: 0,
-          color: 'transparent',
-        });
-      }
-      rows.push({ line: 0, characters });
-    }
-
-    return { rows } as RenderedGrid;
-  }
-
   private async createCanvasGrid(
     inputType: 'img' | 'random'
   ): Promise<CanvasGrid> {
@@ -104,8 +126,6 @@ export class Blociau {
           this.options.image,
           this.options.characterHeight,
           this.options.characterWidth
-          // this.maxVisibleRows,
-          // this.maxCharactersPerRow
         );
       }
       case 'random': {
@@ -148,128 +168,200 @@ export class Blociau {
     }
   }
 
-  private run(): void {
-    // this is where the animation happens
-    window.requestAnimationFrame((timestamp) =>
-      this.onRequestAnimationFrame(timestamp)
-    );
-  }
-
-  private onRequestAnimationFrame(timestamp: number): void {
-    this.currentTimestamp = timestamp;
-
-    const shouldRender = this.shouldRender(
-      this.runningState,
-      timestamp,
-      this.lastRenderTimestamp,
-      this.characterDelay
-    );
-
-    if (!shouldRender) {
-      this.run();
+  private run(resume: boolean): void {
+    if (this.runningState !== 'running') {
       return;
     }
-    let requireCharacterDelay = false;
-    if (this.mistakesCount > 0 && this.history.length > 1) {
-      this.history.pop();
 
-      // replace rendered grid with one from history
-      const previousState = this.history[this.history.length - 1];
-      this.renderedGrid = previousState.renderedGrid;
-      this.index = previousState.index;
-      // remove last 2 entires
-
-      this.mistakesCount--;
-      requireCharacterDelay = true;
-    } else {
-      requireCharacterDelay = this.updateRenderedGrid(this.index);
-      this.increaseIndex(this.index);
-      this.updateHistory(this.renderedGrid, this.index);
-
-      const totalNumberOfVisibleAnimatedCharacters =
-        this.totalNumberOfAvailableCharacters();
-
-      this.mistakesCount = this.calculateMistakesCount(
-        totalNumberOfVisibleAnimatedCharacters,
-        this.options.maxErrorPercentage,
-        this.history.length
-      );
-    }
-
-    // render the output, could be svg or canvas
-    this.renderer.render(this.canvasGrid, this.renderedGrid);
-    this.lastRenderTimestamp = timestamp;
-
-    this.characterDelay = requireCharacterDelay
-      ? this.randomCharacterDelay(
-          this.options.minTypingDelay,
-          this.options.maxTypingDelay
-        )
-      : 0;
-
-    this.run();
+    window.requestAnimationFrame((timestamp: DOMHighResTimeStamp) => {
+      this.onRequestAnimationFrame(timestamp, resume);
+    });
   }
 
-  private updateHistory(renderedGrid: RenderedGrid, index: Index): void {
-    if (this.history.length === this.options.historySize) {
-      this.history.shift();
+  private createRowIfRequired(): void {
+    // create row if doent exist
+    if (
+      this.renderedRows.length === 0 ||
+      this.index.row >= this.renderedRows.length
+    ) {
+      this.renderedRows.push({ characters: [], line: 0 });
     }
 
-    const state: { renderedGrid: RenderedGrid; index: Index } = {
+    const renderedRow = this.renderedRows[this.index.row];
+
+    if (
+      renderedRow.characters.length === 0 ||
+      (this.index.character >= renderedRow.characters.length &&
+        renderedRow.characters.length < this.maxCharactersPerRow)
+    ) {
+      renderedRow.characters.push({
+        rendered: false,
+        wordIndex: 0,
+        color: 'transparent',
+        renderTime: 0,
+      });
+    }
+  }
+  private requestCount = 0;
+  private onRequestAnimationFrame(
+    timestamp: DOMHighResTimeStamp,
+    resetTimestamp: boolean
+  ): void {
+    this.requestCount++;
+    const MAX_STEPS = 300; // reduce scenarios where time between frames is huge
+    let currentStep = 0;
+    let frameReady = false;
+
+    while (!frameReady) {
+      if (this.runningState !== 'running') {
+        frameReady = true;
+        break;
+      }
+
+      this.createRowIfRequired();
+
+      const previousTimestamp = this.getPreviousTimestamp(timestamp);
+
+      if (previousTimestamp > timestamp) {
+        frameReady = true;
+        break;
+      }
+
+      const gridCharacter = this.getCanvasGridCharacter(this.index);
+
+      if (gridCharacter.visible && this.mistakesCount === 0) {
+        this.mistakesCount = this.calculateMistakesCount();
+      }
+
+      const characterRenderTime = this.calculateRenderTime(
+        gridCharacter.visible,
+        previousTimestamp
+      );
+      const renderedCharacter = this.getRenderedGridCharacter(this.index);
+      if (!renderedCharacter) {
+        throw new Error("Rendered character doesn't exist");
+      }
+
+      renderedCharacter.renderTime = characterRenderTime;
+
+      if (resetTimestamp) {
+        renderedCharacter.renderTime = timestamp;
+        frameReady = true;
+      }
+
+      // Should prevent calculating thousands of steps
+      // if there is a long delay between last and current time stamp
+      if (MAX_STEPS === currentStep) {
+        renderedCharacter.renderTime = timestamp;
+        frameReady = true;
+      }
+
+      this.updateRenderedCharacter(
+        renderedCharacter,
+        renderedCharacter.renderTime
+      );
+      this.updateHistory(this.renderedRows, this.index);
+      this.increaseIndex(this.index);
+      this.scrollIfRequired(this.index);
+      currentStep++;
+    }
+
+    currentStep = 0;
+    this.renderer.render(this.canvasGrid, this.renderedRows);
+
+    this.run(false);
+  }
+
+  private calculateRenderTime(
+    characterVisible: boolean,
+    previousTimestamp: DOMHighResTimeStamp
+  ): DOMHighResTimeStamp {
+    if (!characterVisible) {
+      return previousTimestamp;
+    }
+
+    // if (renderedCharacter.renderTime === undefined) {
+    const characterDelayMilliseconds = this.randomCharacterDelay(
+      this.options.minTypingDelayMilliseconds,
+      this.options.maxTypingDelayMilliseconds
+    );
+
+    // get previous render time, and add to it
+    const characterRenderTime =
+      previousTimestamp + characterDelayMilliseconds / this.options.speed;
+
+    return characterRenderTime;
+  }
+
+  private getPreviousTimestamp(
+    currentTimestamp: DOMHighResTimeStamp
+  ): DOMHighResTimeStamp {
+    const previousState =
+      this.history.length > 0
+        ? this.history[this.history.length - 1]
+        : undefined;
+    const previousRenderedCharacter = previousState
+      ? this.getRenderedGridCharacter(previousState.index)
+      : undefined;
+    const previousTimestamp = previousRenderedCharacter
+      ? previousRenderedCharacter.renderTime
+      : currentTimestamp;
+
+    return previousTimestamp;
+  }
+
+  private updateHistory(renderedRows: RenderedRow[], index: Index): void {
+    if (this.history.length === this.options.historySize) {
+      const [, ...newArray] = this.history;
+      this.history = newArray;
+    }
+
+    const state: { renderedRows: RenderedRow[]; index: Index } = {
       index: index,
-      renderedGrid: renderedGrid,
+      renderedRows: [...renderedRows],
     };
 
     this.history.push(structuredClone(state));
   }
 
-  private totalNumberOfAvailableCharacters(): number {
-    return this.canvasGrid.rows.reduce((acc, row) => {
-      return acc + row.characters.length;
-    }, 0);
-  }
-
   // character delay in milliseconds
-  private randomCharacterDelay(minDelay: number, maxDelay: number): number {
+  private randomCharacterDelay(
+    minDelayMilliseconds: number,
+    maxDelayMilliseconds: number
+  ): number {
     // random number between min and max
-    return Math.floor(Math.random() * (maxDelay - minDelay + 1)) + minDelay;
-  }
-
-  private shouldRender(
-    runningState: RunningState,
-    currentTimestamp: number,
-    lastRenderTimestamp: number,
-    characterDelay: number
-  ): boolean {
-    if (runningState !== 'running') {
-      return false;
-    }
-
-    // if the difference between the current timestamp and the previous timestamp
-    // is greater than the character delay then we should render
-    return currentTimestamp - lastRenderTimestamp >= characterDelay;
+    return (
+      Math.floor(
+        Math.random() * (maxDelayMilliseconds - minDelayMilliseconds + 1)
+      ) + minDelayMilliseconds
+    );
   }
 
   private getCanvasGridCharacter(index: Index): CanvasCharacter {
     return this.canvasGrid.rows[index.row].characters[index.character];
   }
 
-  private getRenderedGridCharacter(index: Index): RenderedCharacter {
-    return this.renderedGrid.rows[index.row].characters[index.character];
+  private getRenderedGridCharacter(
+    index: Index
+  ): RenderedCharacter | undefined {
+    if (index.row < 0 || index.row >= this.renderedRows.length) {
+      return undefined;
+    }
+
+    const row = this.renderedRows[index.row];
+
+    if (index.character < 0 || index.character >= row.characters.length) {
+      return undefined;
+    }
+
+    return this.renderedRows[index.row].characters[index.character];
   }
 
-  // private currentWord: RenderedWord | undefined = undefined;
-  private currentWordColor: string | undefined = undefined;
-  private currentWordLength: number | undefined = undefined;
-  private currentWordIndex: number = 0;
-  private currentWordCharacterCount = 0;
-
-  // todo switch to index instead of grid index
-  private updateRenderedGrid(index: Index): boolean {
+  private updateRenderedCharacter(
+    renderedCharacter: RenderedCharacter,
+    renderTime: DOMHighResTimeStamp
+  ): void {
     try {
-      const gridCharacter = this.getCanvasGridCharacter(index);
-      const renderedCharacter = this.getRenderedGridCharacter(index);
-
       const previousColor = this.currentWordColor;
       const previousWordLength = this.currentWordLength;
 
@@ -303,8 +395,7 @@ export class Blociau {
       renderedCharacter.color = this.currentWordColor;
       renderedCharacter.wordIndex = this.currentWordIndex;
       renderedCharacter.rendered = true;
-
-      return gridCharacter.visible;
+      renderedCharacter.renderTime = renderTime;
     } catch (e) {
       console.error('updateRenderedGrid error', e);
       throw e;
@@ -331,64 +422,28 @@ export class Blociau {
       index.row++;
       return;
     }
+  }
 
+  private scrollIfRequired(index: Index): void {
     if (
       index.character === this.maxCharactersPerRow - 1 &&
       index.row === this.maxVisibleRows - 1
     ) {
       index.character = 0;
-      this.renderedGrid.rows.shift();
-      const newRow = this.pushNewRow();
-      this.renderedGrid.rows.push(newRow);
+      const [, ...newArray] = this.renderedRows;
+      this.renderedRows = newArray;
     }
   }
 
-  private pushNewRow(): RenderedRow {
-    const characters: RenderedCharacter[] = [];
-    for (let x = 0; x < this.maxCharactersPerRow; x++) {
-      characters.push({
-        rendered: false,
-        wordIndex: 0,
-        color: 'transparent',
-      });
-    }
-
-    return { line: 0, characters };
-  }
-
-  private correctKeyStroke(): boolean {
-    // return true 1 in 10 times
-    return Math.random() < 0.92;
-  }
-
-  private calculateMistakesCount(
-    totalVisibleAnimatedCharacters: number,
-    maxErrorPercentage: number,
-    historyLength: number
-  ): number {
-    const correctKeyStroke = this.correctKeyStroke();
+  private calculateMistakesCount(): number {
+    const correctKeyStroke = Math.random() < 0.92;
 
     if (correctKeyStroke) {
       return 0;
     }
 
-    let result = this.randomNumberOfKeystrokeMistakes(
-      totalVisibleAnimatedCharacters,
-      maxErrorPercentage
-    );
-
-    result = result > historyLength ? historyLength : result;
-
-    return result;
-  }
-
-  private randomNumberOfKeystrokeMistakes(
-    totalVisibleAnimatedCharacters: number,
-    maxErrorPercentage: number
-  ): number {
-    const max = (maxErrorPercentage / 100) * totalVisibleAnimatedCharacters;
-    const result = Math.floor(Math.random() * max) + 1;
-    return result;
+    // return random number between 1 and length of history
+    return Math.floor(Math.random() * this.history.length) + 1;
   }
 
   private randomColor(
@@ -419,5 +474,8 @@ export class Blociau {
   }
 }
 
-type RunningState = 'running' | 'paused' | 'stopped';
-type Index = { row: number; character: number };
+export type RunningState = 'running' | 'paused' | 'autoPaused' | 'stopped';
+interface Index {
+  row: number;
+  character: number;
+}

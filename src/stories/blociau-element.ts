@@ -1,8 +1,6 @@
 import { LitElement, css, html } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { Blociau } from '../lib/blociau';
-
-export interface BlociauProps {}
+import { Blociau, RunningState } from '../lib/blociau';
 
 /**
  * An example element.
@@ -20,26 +18,65 @@ export class BlociauElement extends LitElement {
     this.outputElement.id = 'output';
   }
 
-  /**
-   * Copy for the read the docs hint.
-   */
-  @property({ type: String })
-  docsHint = 'Click on the Vite and Lit logos to learn more';
-
-  /**
-   * The number of times the button has been clicked.
-   */
-  @property({ type: Number })
-  count = 0;
+  @property()
+  public runningState: RunningState = 'stopped';
 
   public async connectedCallback() {
     super.connectedCallback();
     this.blociau = await this.createBlociau();
-    this.blociau.start();
+    await this.blociau.start();
+    this.runningState = this.blociau.runningState;
+    this.requestUpdate();
   }
 
   protected render() {
-    return html` <div id="output">${this.outputElement}</div> `;
+    return html`
+      <div id="output">${this.outputElement}</div>
+      <div>
+        ${this.runningState === 'running'
+          ? html`<button @click="${() => this.pause()}">Pause</button>`
+          : ''}
+      </div>
+      <div>
+        ${this.runningState === 'running'
+          ? html`<button @click="${() => this.stop()}">Stop</button>`
+          : ''}
+      </div>
+      <div>
+        ${this.runningState === 'stopped'
+          ? html`<button @click="${() => this.start()}">Start</button>`
+          : ''}
+      </div>
+      <div>
+        ${this.runningState === 'paused'
+          ? html`<button @click="${() => this.resume()}">Continue</button>`
+          : ''}
+      </div>
+    `;
+  }
+
+  private pause(): void {
+    this.blociau?.pause();
+    this.runningState = 'paused';
+    this.requestUpdate();
+  }
+
+  private stop(): void {
+    this.blociau?.stop();
+    this.runningState = 'stopped';
+    this.requestUpdate(this.runningState);
+  }
+
+  private resume(): void {
+    this.blociau?.resume();
+    this.runningState = 'running';
+    this.requestUpdate(this.runningState);
+  }
+
+  private start(): void {
+    this.blociau?.start();
+    this.runningState = 'running';
+    this.requestUpdate(this.runningState);
   }
 
   static styles = css`
@@ -68,8 +105,8 @@ export class BlociauElement extends LitElement {
       canvasWidth: 32,
       characterHeight: 11,
       characterWidth: 11,
-      padding: 0.1,
-      borderRadius: 0.1,
+      padding: 1,
+      borderRadius: 1,
       wordStyles: [
         {
           wordLength: 1,
@@ -99,9 +136,10 @@ export class BlociauElement extends LitElement {
       inputType: 'img',
       outputType: 'svg',
       outputElement: this.outputElement,
-      maxErrorPercentage: 10,
-      minTypingDelay: 50,
-      maxTypingDelay: 150,
+      maxErrorPercentage: 20,
+      minTypingDelayMilliseconds: 100,
+      maxTypingDelayMilliseconds: 150,
+      speed: 0.2,
       historySize: 5,
       image: image,
     });

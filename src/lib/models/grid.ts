@@ -13,12 +13,6 @@ export interface CanvasCharacter {
   visible: boolean;
 }
 
-////////////////
-
-export interface RenderedGrid {
-  rows: RenderedRow[];
-}
-
 export interface RenderedRow {
   line: number;
   characters: RenderedCharacter[];
@@ -28,6 +22,7 @@ export interface RenderedCharacter {
   wordIndex: number;
   rendered: boolean;
   color: string;
+  renderTime: DOMHighResTimeStamp;
 }
 
 export interface RenderedWord {

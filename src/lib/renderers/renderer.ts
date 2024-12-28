@@ -1,5 +1,6 @@
-import { CanvasGrid, RenderedGrid } from '../models/grid';
+import { CanvasGrid, RenderedRow } from '../models/grid';
 
 export interface Renderer {
-  render(grid: CanvasGrid, animatedStateRows: RenderedGrid): void;
+  render(grid: CanvasGrid, renderedRows: RenderedRow[]): void;
+  destroy(): void;
 }
