@@ -8,7 +8,6 @@ export class Options {
     public inputType: 'img' | 'random',
     public outputType: 'svg' | 'canvas',
     public outputElement: HTMLElement,
-    public maxErrorPercentage: number,
     public minTypingDelayMilliseconds: number,
     public maxTypingDelayMilliseconds: number,
     public speed: number,

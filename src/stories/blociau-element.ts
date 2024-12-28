@@ -136,10 +136,9 @@ export class BlociauElement extends LitElement {
       inputType: 'img',
       outputType: 'svg',
       outputElement: this.outputElement,
-      maxErrorPercentage: 20,
       minTypingDelayMilliseconds: 100,
       maxTypingDelayMilliseconds: 150,
-      speed: 0.2,
+      speed: 2,
       historySize: 5,
       image: image,
     });
