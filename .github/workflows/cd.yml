@@ -40,15 +40,10 @@ jobs:
 
       - name: Create Release
         id: create_release
-        uses: actions/create-release@v1
+        run: |
+          gh release create v${{ steps.extract_version.outputs.VERSION }} --title "v${{ steps.extract_version.outputs.VERSION }}" --notes "${{ steps.github_release.outputs.changelog }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: v${{ steps.extract_version.outputs.VERSION }}
-          release_name: v${{ steps.extract_version.outputs.VERSION }}
-          body: ${{steps.github_release.outputs.changelog}}
-          draft: false
-          prerelease: false
 
       - run: npm run deploy
         name: Deploy to NPM
