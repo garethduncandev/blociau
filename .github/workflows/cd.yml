@@ -41,7 +41,7 @@ jobs:
       - name: Create Release
         id: create_release
         run: |
-          gh release create v${{ steps.extract_version.outputs.VERSION }} --title "v${{ steps.extract_version.outputs.VERSION }}" --notes "${{ steps.github_release.outputs.changelog }}"
+          gh release create v${{ steps.extract_version.outputs.VERSION }} --title "v${{ steps.extract_version.outputs.VERSION }}" --generate-notes"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
