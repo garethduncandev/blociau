@@ -1,6 +1,6 @@
-import { CanvasGrid, CanvasRow } from '../models/grid';
+import { CanvasGrid, CanvasRow } from "../models/grid";
 
-import { GridGenerator } from './grid-generator';
+import { GridGenerator } from "./grid-generator";
 
 export class RandomGridGenerator implements GridGenerator {
   public create(rowsCount: number, rowCharactersCount: number): CanvasGrid {
@@ -12,11 +12,11 @@ export class RandomGridGenerator implements GridGenerator {
     for (let i = 0; i < canvasGrid.maxVisibleRows; i++) {
       const maxVisibleCharactersPerRow = this.randomNumber(
         1,
-        rowCharactersCount
+        rowCharactersCount,
       );
       const row = this.createRow(
         rowCharactersCount,
-        maxVisibleCharactersPerRow
+        maxVisibleCharactersPerRow,
       );
 
       canvasGrid.rows.push(row);
@@ -27,7 +27,7 @@ export class RandomGridGenerator implements GridGenerator {
 
   public createRow(
     charactersPerRow: number,
-    maxVisibleCharacters: number
+    maxVisibleCharacters: number,
   ): CanvasRow {
     const row: CanvasRow = {
       characters: [],

@@ -1,14 +1,14 @@
-import { ImageGridGenerator } from './grid-generators/image-grid-generator';
-import { RandomGridGenerator } from './grid-generators/random-grid-generator';
+import { ImageGridGenerator } from "./grid-generators/image-grid-generator";
+import { RandomGridGenerator } from "./grid-generators/random-grid-generator";
 import {
   CanvasCharacter,
   CanvasGrid,
   RenderedCharacter,
   RenderedRow,
-} from './models/grid';
-import { Options, WordStyle } from './models/options';
-import { Renderer } from './renderers/renderer';
-import { SvgRenderer } from './renderers/svg-renderer';
+} from "./models/grid";
+import { Options, WordStyle } from "./models/options";
+import { Renderer } from "./renderers/renderer";
+import { SvgRenderer } from "./renderers/svg-renderer";
 
 export class Blociau {
   private canvasGrid!: CanvasGrid;
@@ -20,7 +20,7 @@ export class Blociau {
   private renderer!: Renderer;
 
   // states, timestamps and indexes
-  public runningState: RunningState = 'stopped';
+  public runningState: RunningState = "stopped";
   public index: Index = { row: 0, character: 0 };
   private mistakesCount = 0;
   private currentWordColor: string | undefined = undefined;
@@ -32,25 +32,25 @@ export class Blociau {
 
   public async start(): Promise<void> {
     await this.init();
-    this.runningState = 'running';
+    this.runningState = "running";
     this.run(false);
   }
 
   public pause(): void {
-    this.runningState = 'paused';
+    this.runningState = "paused";
   }
 
   public autoPause(): void {
-    this.runningState = 'autoPaused';
+    this.runningState = "autoPaused";
   }
 
   public resume(): void {
-    this.runningState = 'running';
+    this.runningState = "running";
     this.run(true);
   }
 
   public stop(): void {
-    this.runningState = 'stopped';
+    this.runningState = "stopped";
     if (this.renderer) {
       // clear previous render
       this.renderer.destroy();
@@ -76,21 +76,21 @@ export class Blociau {
       options.maxTypingDelayMilliseconds <= 0
     ) {
       throw new Error(
-        'minTypingDelayMilliseconds and maxTypingDelayMilliseconds must be greater than 0'
+        "minTypingDelayMilliseconds and maxTypingDelayMilliseconds must be greater than 0",
       );
     }
   }
 
   private handleVisibilityChange(): void {
-    document.removeEventListener('visibilitychange', () => undefined);
-    document.addEventListener('visibilitychange', () => {
+    document.removeEventListener("visibilitychange", () => undefined);
+    document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
-        if (this.runningState === 'running') {
-          console.log('auto pausing');
+        if (this.runningState === "running") {
+          console.log("auto pausing");
           this.autoPause();
         }
       } else {
-        if (this.runningState === 'autoPaused') {
+        if (this.runningState === "autoPaused") {
           this.resume();
         }
       }
@@ -101,7 +101,7 @@ export class Blociau {
     let rowsCount = 0;
     let rowCharactersCount = 0;
 
-    if (options.inputType === 'img' && options.image) {
+    if (options.inputType === "img" && options.image) {
       rowsCount = options.image.height / options.characterHeight;
       rowCharactersCount = options.image.width / options.characterWidth;
     } else {
@@ -114,24 +114,24 @@ export class Blociau {
   }
 
   private async createCanvasGrid(
-    inputType: 'img' | 'random'
+    inputType: "img" | "random",
   ): Promise<CanvasGrid> {
     switch (inputType) {
-      case 'img': {
+      case "img": {
         if (!this.options.image) {
-          throw new Error('Image is required when inputType is img');
+          throw new Error("Image is required when inputType is img");
         }
 
         return await new ImageGridGenerator().create(
           this.options.image,
           this.options.characterHeight,
-          this.options.characterWidth
+          this.options.characterWidth,
         );
       }
-      case 'random': {
+      case "random": {
         return new RandomGridGenerator().create(
           this.maxVisibleRows,
-          this.maxCharactersPerRow
+          this.maxCharactersPerRow,
         );
       }
     }
@@ -139,18 +139,18 @@ export class Blociau {
 
   private createRenderer(
     options: Options,
-    maxCharactersPerRow: number
+    maxCharactersPerRow: number,
   ): Renderer {
     let canvasWidth = options.canvasWidth;
     let canvasHeight = options.canvasHeight;
 
-    if (options.inputType === 'img' && options.image) {
+    if (options.inputType === "img" && options.image) {
       canvasWidth = options.image.width;
       canvasHeight = options.image.height;
     }
 
     switch (options.outputType) {
-      case 'svg': {
+      case "svg": {
         return new SvgRenderer(
           canvasWidth,
           canvasHeight,
@@ -159,17 +159,17 @@ export class Blociau {
           options.characterHeight,
           options.outputElement,
           options.padding,
-          options.borderRadius
+          options.borderRadius,
         );
       }
-      case 'canvas': {
-        throw new Error('Not implemented');
+      case "canvas": {
+        throw new Error("Not implemented");
       }
     }
   }
 
   private run(resume: boolean): void {
-    if (this.runningState !== 'running') {
+    if (this.runningState !== "running") {
       return;
     }
 
@@ -197,7 +197,7 @@ export class Blociau {
       renderedRow.characters.push({
         rendered: false,
         wordIndex: 0,
-        color: 'transparent',
+        color: "transparent",
         renderTime: 0,
       });
     }
@@ -205,7 +205,7 @@ export class Blociau {
   private requestCount = 0;
   private onRequestAnimationFrame(
     timestamp: DOMHighResTimeStamp,
-    resetTimestamp: boolean
+    resetTimestamp: boolean,
   ): void {
     this.requestCount++;
     const MAX_STEPS = 300; // reduce scenarios where time between frames is huge
@@ -213,7 +213,7 @@ export class Blociau {
     let frameReady = false;
 
     while (!frameReady) {
-      if (this.runningState !== 'running') {
+      if (this.runningState !== "running") {
         frameReady = true;
         break;
       }
@@ -235,7 +235,7 @@ export class Blociau {
 
       const characterRenderTime = this.calculateRenderTime(
         gridCharacter.visible,
-        previousTimestamp
+        previousTimestamp,
       );
       const renderedCharacter = this.getRenderedGridCharacter(this.index);
       if (!renderedCharacter) {
@@ -258,7 +258,7 @@ export class Blociau {
 
       this.updateRenderedCharacter(
         renderedCharacter,
-        renderedCharacter.renderTime
+        renderedCharacter.renderTime,
       );
       this.updateHistory(this.renderedRows, this.index);
       this.increaseIndex(this.index);
@@ -274,7 +274,7 @@ export class Blociau {
 
   private calculateRenderTime(
     characterVisible: boolean,
-    previousTimestamp: DOMHighResTimeStamp
+    previousTimestamp: DOMHighResTimeStamp,
   ): DOMHighResTimeStamp {
     if (!characterVisible) {
       return previousTimestamp;
@@ -283,7 +283,7 @@ export class Blociau {
     // if (renderedCharacter.renderTime === undefined) {
     const characterDelayMilliseconds = this.randomCharacterDelay(
       this.options.minTypingDelayMilliseconds,
-      this.options.maxTypingDelayMilliseconds
+      this.options.maxTypingDelayMilliseconds,
     );
 
     // get previous render time, and add to it
@@ -294,7 +294,7 @@ export class Blociau {
   }
 
   private getPreviousTimestamp(
-    currentTimestamp: DOMHighResTimeStamp
+    currentTimestamp: DOMHighResTimeStamp,
   ): DOMHighResTimeStamp {
     const previousState =
       this.history.length > 0
@@ -327,12 +327,12 @@ export class Blociau {
   // character delay in milliseconds
   private randomCharacterDelay(
     minDelayMilliseconds: number,
-    maxDelayMilliseconds: number
+    maxDelayMilliseconds: number,
   ): number {
     // random number between min and max
     return (
       Math.floor(
-        Math.random() * (maxDelayMilliseconds - minDelayMilliseconds + 1)
+        Math.random() * (maxDelayMilliseconds - minDelayMilliseconds + 1),
       ) + minDelayMilliseconds
     );
   }
@@ -342,7 +342,7 @@ export class Blociau {
   }
 
   private getRenderedGridCharacter(
-    index: Index
+    index: Index,
   ): RenderedCharacter | undefined {
     if (index.row < 0 || index.row >= this.renderedRows.length) {
       return undefined;
@@ -359,7 +359,7 @@ export class Blociau {
 
   private updateRenderedCharacter(
     renderedCharacter: RenderedCharacter,
-    renderTime: DOMHighResTimeStamp
+    renderTime: DOMHighResTimeStamp,
   ): void {
     try {
       const previousColor = this.currentWordColor;
@@ -368,22 +368,22 @@ export class Blociau {
       if (!this.currentWordColor || !this.currentWordLength) {
         this.currentWordLength = this.randomLength(
           previousWordLength ?? 0,
-          this.options.wordStyles
+          this.options.wordStyles,
         );
         this.currentWordColor = this.randomColor(
-          previousColor ?? '',
+          previousColor ?? "",
           this.currentWordLength,
-          this.options.wordStyles
+          this.options.wordStyles,
         );
       } else if (this.currentWordCharacterCount > this.currentWordLength) {
         this.currentWordLength = this.randomLength(
           previousWordLength ?? 0,
-          this.options.wordStyles
+          this.options.wordStyles,
         );
         this.currentWordColor = this.randomColor(
-          previousColor ?? '',
+          previousColor ?? "",
           this.currentWordLength,
-          this.options.wordStyles
+          this.options.wordStyles,
         );
 
         this.currentWordIndex++;
@@ -397,7 +397,7 @@ export class Blociau {
       renderedCharacter.rendered = true;
       renderedCharacter.renderTime = renderTime;
     } catch (e) {
-      console.error('updateRenderedGrid error', e);
+      console.error("updateRenderedGrid error", e);
       throw e;
     }
   }
@@ -449,7 +449,7 @@ export class Blociau {
   private randomColor(
     previousColor: string,
     wordLength: number,
-    wordStyles: WordStyle[]
+    wordStyles: WordStyle[],
   ): string {
     const colors = (
       wordStyles.find((style) => style.wordLength === wordLength)?.colors ?? []
@@ -463,7 +463,7 @@ export class Blociau {
 
   private randomLength(
     previousWordLength: number,
-    wordStyles: WordStyle[]
+    wordStyles: WordStyle[],
   ): number {
     const wordLengths = wordStyles
       .map((style) => style.wordLength)
@@ -474,7 +474,7 @@ export class Blociau {
   }
 }
 
-export type RunningState = 'running' | 'paused' | 'autoPaused' | 'stopped';
+export type RunningState = "running" | "paused" | "autoPaused" | "stopped";
 interface Index {
   row: number;
   character: number;

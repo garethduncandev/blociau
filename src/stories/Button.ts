@@ -1,6 +1,6 @@
-import { html } from 'lit';
-import { styleMap } from 'lit/directives/style-map.js';
-import './button.css';
+import { html } from "lit";
+import { styleMap } from "lit/directives/style-map.js";
+import "./button.css";
 
 export interface ButtonProps {
   /**
@@ -14,7 +14,7 @@ export interface ButtonProps {
   /**
    * How large should the button be?
    */
-  size?: 'small' | 'medium' | 'large';
+  size?: "small" | "medium" | "large";
   /**
    * Button contents
    */
@@ -35,17 +35,17 @@ export const Button = ({
   onClick,
 }: ButtonProps) => {
   const mode = primary
-    ? 'storybook-button--primary'
-    : 'storybook-button--secondary';
+    ? "storybook-button--primary"
+    : "storybook-button--secondary";
 
   return html`
     <button
       type="button"
       class=${[
-        'storybook-button',
-        `storybook-button--${size || 'medium'}`,
+        "storybook-button",
+        `storybook-button--${size || "medium"}`,
         mode,
-      ].join(' ')}
+      ].join(" ")}
       style=${styleMap({ backgroundColor })}
       @click=${onClick}
     >

@@ -1,12 +1,12 @@
-import { createContext, isWhiteOrTransparent } from '../helpers/canvas';
-import { CanvasGrid, CanvasRow } from '../models/grid';
-import { GridGenerator } from './grid-generator';
+import { createContext, isWhiteOrTransparent } from "../helpers/canvas";
+import { CanvasGrid, CanvasRow } from "../models/grid";
+import { GridGenerator } from "./grid-generator";
 
 export class ImageGridGenerator implements GridGenerator {
   public async create(
     image: HTMLImageElement,
     characterHeight: number,
-    characterWidth: number
+    characterWidth: number,
   ): Promise<CanvasGrid> {
     const context = createContext(image.width, image.height);
     context.drawImage(image, 0, 0, image.width, image.height);
@@ -25,7 +25,7 @@ export class ImageGridGenerator implements GridGenerator {
           startX,
           startY,
           characterWidth,
-          characterHeight
+          characterHeight,
         );
         row.characters.push({ visible: characterVisible });
       }

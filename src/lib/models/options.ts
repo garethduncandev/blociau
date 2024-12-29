@@ -5,8 +5,8 @@ export class Options {
     public characterHeight: number,
     public characterWidth: number,
     public wordStyles: WordStyle[],
-    public inputType: 'img' | 'random',
-    public outputType: 'svg' | 'canvas',
+    public inputType: "img" | "random",
+    public outputType: "svg" | "canvas",
     public outputElement: HTMLElement,
     public minTypingDelayMilliseconds: number,
     public maxTypingDelayMilliseconds: number,
@@ -14,13 +14,13 @@ export class Options {
     public historySize: number,
     public borderRadius: number,
     public padding: number,
-    public image: HTMLImageElement | undefined
+    public image: HTMLImageElement | undefined,
   ) {}
 }
 
 export class WordStyle {
   public constructor(
     public wordLength: number,
-    public colors: string[]
+    public colors: string[],
   ) {}
 }

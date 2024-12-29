@@ -1,5 +1,5 @@
-import { CanvasGrid, RenderedRow } from '../models/grid';
-import { Renderer } from './renderer';
+import { CanvasGrid, RenderedRow } from "../models/grid";
+import { Renderer } from "./renderer";
 
 export class SvgRenderer implements Renderer {
   private svg?: SVGSVGElement;
@@ -11,7 +11,7 @@ export class SvgRenderer implements Renderer {
     public characterHeight: number,
     public outputElement: HTMLElement,
     public padding: number,
-    public borderRadius: number
+    public borderRadius: number,
   ) {}
 
   public render(grid: CanvasGrid, renderedRows: RenderedRow[]): void {
@@ -51,12 +51,12 @@ export class SvgRenderer implements Renderer {
 
   private setPathsTransparent(
     paths: NodeListOf<SVGPathElement>,
-    startIndex: number
+    startIndex: number,
   ): void {
     for (let i = startIndex; i < paths.length; i++) {
       const path = paths[i];
-      if (path.getAttribute('fill') !== 'transparent') {
-        path.setAttribute('fill', 'transparent');
+      if (path.getAttribute("fill") !== "transparent") {
+        path.setAttribute("fill", "transparent");
       }
     }
   }
@@ -65,7 +65,7 @@ export class SvgRenderer implements Renderer {
     paths: NodeListOf<SVGPathElement> | never[],
     grid: CanvasGrid,
     renderedRowIndex: number,
-    renderedRow: RenderedRow
+    renderedRow: RenderedRow,
   ): void {
     for (
       let characterIndex = 0;
@@ -94,7 +94,7 @@ export class SvgRenderer implements Renderer {
       const previousSvgCharacter: SvgCharacter | undefined =
         renderedPreviousCharacter && gridPreviousCharacter
           ? {
-              color: renderedPreviousCharacter.color ?? '',
+              color: renderedPreviousCharacter.color ?? "",
               visible: gridPreviousCharacter.visible ?? false,
             }
           : undefined;
@@ -114,7 +114,7 @@ export class SvgRenderer implements Renderer {
       const nextSvgCharacter: SvgCharacter | undefined =
         renderedNextCharacter && gridNextCharacter
           ? {
-              color: renderedNextCharacter.color ?? '',
+              color: renderedNextCharacter.color ?? "",
               visible: gridNextCharacter.visible ?? false,
             }
           : undefined;
@@ -126,7 +126,7 @@ export class SvgRenderer implements Renderer {
         characterIndex,
         svgCharacter,
         previousSvgCharacter,
-        nextSvgCharacter
+        nextSvgCharacter,
       );
     }
   }
@@ -139,7 +139,7 @@ export class SvgRenderer implements Renderer {
 
     svgCharacter: SvgCharacter,
     previousSvgCharacter: SvgCharacter | undefined,
-    nextSvgCharacter: SvgCharacter | undefined
+    nextSvgCharacter: SvgCharacter | undefined,
   ): void {
     const path =
       paths[
@@ -161,22 +161,22 @@ export class SvgRenderer implements Renderer {
     const visible = gridEntry.visible;
 
     if (!visible) {
-      path.setAttribute('fill', 'transparent');
+      path.setAttribute("fill", "transparent");
       return;
     }
 
-    path.setAttribute('fill', svgCharacter.color);
+    path.setAttribute("fill", svgCharacter.color);
 
     const startX = renderedCharacterIndex * this.characterWidth;
     const startY = renderedRowIndex * this.characterHeight;
 
-    let border: Border = 'none';
+    let border: Border = "none";
     if (newWord && lastCharacterOfWord) {
-      border = 'both';
+      border = "both";
     } else if (newWord) {
-      border = 'left';
+      border = "left";
     } else if (lastCharacterOfWord) {
-      border = 'right';
+      border = "right";
     }
 
     const newPath = this.createSvgPathAttributeValue(
@@ -184,10 +184,10 @@ export class SvgRenderer implements Renderer {
       startY,
       this.characterWidth,
       this.characterHeight,
-      border
+      border,
     );
 
-    path.setAttribute('d', newPath);
+    path.setAttribute("d", newPath);
   }
 
   private renderSvg(grid: CanvasGrid, outputElement: HTMLElement) {
@@ -198,12 +198,12 @@ export class SvgRenderer implements Renderer {
       grid,
       this.canvasWidth,
       this.canvasHeight,
-      outputElement.id
+      outputElement.id,
     );
 
     // get the output element from the dom
     if (outputElement) {
-      outputElement.innerHTML = '';
+      outputElement.innerHTML = "";
       outputElement.appendChild(svg);
     }
     return svg;
@@ -213,18 +213,18 @@ export class SvgRenderer implements Renderer {
     grid: CanvasGrid,
     width: number,
     height: number,
-    id: string
+    id: string,
   ): SVGSVGElement {
-    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
-    svg.setAttribute('xmlns:svg', 'http://www.w3.org/2000/svg');
-    svg.setAttribute('viewBox', `0 0 ${width} ${height}`);
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("xmlns", "http://www.w3.org/2000/svg");
+    svg.setAttribute("xmlns:svg", "http://www.w3.org/2000/svg");
+    svg.setAttribute("viewBox", `0 0 ${width} ${height}`);
     const elementNS = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'g'
+      "http://www.w3.org/2000/svg",
+      "g",
     );
-    elementNS.setAttribute('id', `${id}-code-blocks-group`);
-    elementNS.setAttribute('shape-rendering', 'crispEdges');
+    elementNS.setAttribute("id", `${id}-code-blocks-group`);
+    elementNS.setAttribute("shape-rendering", "crispEdges");
 
     svg.appendChild(elementNS);
     const paths = this.createSvgPath(grid);
@@ -245,8 +245,8 @@ export class SvgRenderer implements Renderer {
       for (const [charIndex] of row.characters.entries()) {
         // create path that looks like a path
         const characterPath = document.createElementNS(
-          'http://www.w3.org/2000/svg',
-          'path'
+          "http://www.w3.org/2000/svg",
+          "path",
         );
 
         const attributeValue = this.createSvgPathAttributeValue(
@@ -254,12 +254,12 @@ export class SvgRenderer implements Renderer {
           startY,
           this.characterWidth,
           this.characterHeight,
-          'none'
+          "none",
         );
 
-        characterPath.setAttribute('d', attributeValue);
+        characterPath.setAttribute("d", attributeValue);
         characterPath.classList.add(`char-${rowIndex}-${charIndex}`);
-        characterPath.setAttribute('fill', 'transparent');
+        characterPath.setAttribute("fill", "transparent");
 
         paths.push(characterPath);
         startX += this.characterWidth;
@@ -276,12 +276,12 @@ export class SvgRenderer implements Renderer {
     startY: number,
     characterWidth: number,
     characterHeight: number,
-    border: Border
+    border: Border,
   ): string {
     const radius = this.borderRadius;
     const padding = this.padding;
 
-    if (border === 'left') {
+    if (border === "left") {
       return `
         M${startX + radius + padding},${startY + padding} 
         h${characterWidth - (radius + padding)} 
@@ -293,7 +293,7 @@ export class SvgRenderer implements Renderer {
         z
       `;
     }
-    if (border === 'right') {
+    if (border === "right") {
       return `
         M${startX},${startY + padding} 
         h${characterWidth - (radius + padding)} 
@@ -305,7 +305,7 @@ export class SvgRenderer implements Renderer {
         z`;
     }
 
-    if (border === 'both') {
+    if (border === "both") {
       return `
         M${startX + radius + padding},${startY + padding} 
         h${characterWidth - (radius * 2 + padding * 2)} 
@@ -334,4 +334,4 @@ interface SvgCharacter {
   color: string;
   visible: boolean;
 }
-type Border = 'left' | 'right' | 'both' | 'none';
+type Border = "left" | "right" | "both" | "none";

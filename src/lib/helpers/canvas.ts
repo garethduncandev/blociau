@@ -1,13 +1,13 @@
 export function createContext(
   canvasWidth: number,
-  canvasHeight: number
+  canvasHeight: number,
 ): CanvasRenderingContext2D {
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   canvas.width = canvasWidth;
   canvas.height = canvasHeight;
-  const context = canvas.getContext('2d', { willReadFrequently: true });
+  const context = canvas.getContext("2d", { willReadFrequently: true });
   if (!context) {
-    throw new Error('Could not get context');
+    throw new Error("Could not get context");
   }
   return context;
 }
@@ -17,13 +17,13 @@ export function isWhiteOrTransparent(
   startX: number,
   startY: number,
   blockWidth: number,
-  blockHeight: number
+  blockHeight: number,
 ): boolean {
   const pixelData = context.getImageData(
     startX,
     startY + Math.floor(blockHeight / 2),
     blockWidth,
-    1
+    1,
   ).data;
 
   let whiteOrTransparent = true;

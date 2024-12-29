@@ -1,7 +1,7 @@
 // @ts-check
 
-import eslint from '@eslint/js';
-import tseslint from 'typescript-eslint';
+import eslint from "@eslint/js";
+import tseslint from "typescript-eslint";
 
 export default tseslint.config(
   eslint.configs.recommended,
@@ -9,7 +9,7 @@ export default tseslint.config(
   tseslint.configs.stylistic,
   [
     {
-      ignores: ['dist/*'],
+      ignores: ["dist/*"],
     },
-  ]
+  ],
 );

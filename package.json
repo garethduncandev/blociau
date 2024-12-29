@@ -16,8 +16,11 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "deploy": "npm publish --access public",
-    "lint": "npx eslint .",
-    "lint:fix": "npx eslint --fix ."
+    "lint:check": "npx eslint .",
+    "lint:fix": "npx eslint --fix .",
+    "format:check": "npx prettier .",
+    "format:write": "npx prettier . --write",
+    "format": "npm run lint:fix && npm run format:write"
   },
   "dependencies": {
     "lit": "^3.2.1"
@@ -32,6 +35,7 @@
     "@storybook/web-components": "^8.2.9",
     "@storybook/web-components-vite": "^8.2.9",
     "eslint": "^9.17.0",
+    "prettier": "3.4.2",
     "storybook": "^8.2.9",
     "typescript": "^5.7.2",
     "typescript-eslint": "^8.18.2",
