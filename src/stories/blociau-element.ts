@@ -139,7 +139,8 @@ export class BlociauElement extends LitElement {
       minTypingDelayMilliseconds: 100,
       maxTypingDelayMilliseconds: 150,
       speed: 2,
-      historySize: 5,
+      historySize: 4,
+      keystrokeCorrectPercentage: 99,
       image: image,
     });
 

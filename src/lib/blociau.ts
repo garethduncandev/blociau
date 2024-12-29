@@ -220,6 +220,12 @@ export class Blociau {
 
       this.createRowIfRequired();
 
+      const gridCharacter = this.getCanvasGridCharacter(this.index);
+
+      if (gridCharacter.visible && this.mistakesCount === 0) {
+        this.mistakesCount = this.calculateMistakesCount();
+      }
+
       const previousTimestamp = this.getPreviousTimestamp(timestamp);
 
       if (previousTimestamp > timestamp) {
@@ -227,16 +233,25 @@ export class Blociau {
         break;
       }
 
-      const gridCharacter = this.getCanvasGridCharacter(this.index);
-
-      if (gridCharacter.visible && this.mistakesCount === 0) {
-        this.mistakesCount = this.calculateMistakesCount();
-      }
-
       const characterRenderTime = this.calculateRenderTime(
         gridCharacter.visible,
         previousTimestamp,
       );
+
+      // replace current state with history
+      if (this.mistakesCount > 0 && this.history.length > 1) {
+        // remove last entry from history (as its the current state)
+        this.history.pop();
+
+        // use previous state (and remove as it'll be added again)
+        const previousState = this.history.pop();
+        if (previousState) {
+          this.renderedRows = previousState.renderedRows;
+          this.index = previousState.index;
+        }
+        this.mistakesCount--;
+      }
+
       const renderedCharacter = this.getRenderedGridCharacter(this.index);
       if (!renderedCharacter) {
         throw new Error("Rendered character doesn't exist");
@@ -436,7 +451,10 @@ export class Blociau {
   }
 
   private calculateMistakesCount(): number {
-    const correctKeyStroke = Math.random() < 0.92;
+    const typoChance = this.options.keystrokeCorrectPercentage / 100;
+
+    const random = Math.random();
+    const correctKeyStroke = random < typoChance;
 
     if (correctKeyStroke) {
       return 0;

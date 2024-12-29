@@ -12,6 +12,7 @@ export class Options {
     public maxTypingDelayMilliseconds: number,
     public speed: number,
     public historySize: number,
+    public keystrokeCorrectPercentage: number,
     public borderRadius: number,
     public padding: number,
     public image: HTMLImageElement | undefined,
