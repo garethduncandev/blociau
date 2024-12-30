@@ -1,0 +1,4 @@
+{
+  "indent": 0,
+  "remove": ["scripts", "devDependencies"]
+}
