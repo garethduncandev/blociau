@@ -25,7 +25,6 @@
     "postpack": "clean-package restore"
   },
   "devDependencies": {
-    "lit": "^3.2.1",
     "@chromatic-com/storybook": "^1.8.0",
     "@eslint/js": "^9.17.0",
     "@storybook/addon-essentials": "^8.2.9",
@@ -34,7 +33,9 @@
     "@storybook/test": "^8.2.9",
     "@storybook/web-components": "^8.2.9",
     "@storybook/web-components-vite": "^8.2.9",
+    "clean-package": "^2.2.0",
     "eslint": "^9.17.0",
+    "lit": "^3.2.1",
     "prettier": "3.4.2",
     "storybook": "^8.2.9",
     "typescript": "^5.7.2",
