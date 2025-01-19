@@ -34,4 +34,8 @@ export class ImageGridGenerator implements GridGenerator {
 
     return canvasGrid;
   }
+
+  public createRow(): CanvasRow {
+    throw new Error("Method not implemented.");
+  }
 }
