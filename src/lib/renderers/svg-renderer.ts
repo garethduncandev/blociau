@@ -21,10 +21,7 @@ export class SvgRenderer implements Renderer {
 
     const paths = this.svg.querySelectorAll<SVGPathElement>(`path`) ?? [];
 
-    const totalNumberOfRenderedCharacters =
-      this.totalNumberOfRenderedCharacters(renderedRows);
-
-    this.setPathsTransparent(paths, totalNumberOfRenderedCharacters);
+    this.setPathsTransparent(paths);
 
     for (
       let renderedRowIndex = 0;
@@ -40,21 +37,8 @@ export class SvgRenderer implements Renderer {
     this.svg?.remove();
   }
 
-  private totalNumberOfRenderedCharacters(renderedRows: RenderedRow[]): number {
-    let total = 0;
-
-    for (const renderedRow of renderedRows) {
-      total += renderedRow.characters.length;
-    }
-    return total;
-  }
-
-  private setPathsTransparent(
-    paths: NodeListOf<SVGPathElement>,
-    startIndex: number,
-  ): void {
-    for (let i = startIndex; i < paths.length; i++) {
-      const path = paths[i];
+  private setPathsTransparent(paths: NodeListOf<SVGPathElement>): void {
+    for (const path of paths) {
       if (path.getAttribute("fill") !== "transparent") {
         path.setAttribute("fill", "transparent");
       }

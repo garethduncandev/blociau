@@ -10,14 +10,7 @@ export class RandomGridGenerator implements GridGenerator {
     };
 
     for (let i = 0; i < canvasGrid.maxVisibleRows; i++) {
-      const maxVisibleCharactersPerRow = this.randomNumber(
-        1,
-        rowCharactersCount,
-      );
-      const row = this.createRow(
-        rowCharactersCount,
-        maxVisibleCharactersPerRow,
-      );
+      const row = this.createRow(rowCharactersCount);
 
       canvasGrid.rows.push(row);
     }
@@ -25,16 +18,15 @@ export class RandomGridGenerator implements GridGenerator {
     return canvasGrid;
   }
 
-  public createRow(
-    charactersPerRow: number,
-    maxVisibleCharacters: number,
-  ): CanvasRow {
+  public createRow(charactersPerRow: number): CanvasRow {
+    const maxVisibleCharactersPerRow = this.randomNumber(1, charactersPerRow);
+
     const row: CanvasRow = {
       characters: [],
     };
     for (let character = 0; character < charactersPerRow; character++) {
       row.characters.push({
-        visible: character <= maxVisibleCharacters,
+        visible: character <= maxVisibleCharactersPerRow,
       });
     }
 

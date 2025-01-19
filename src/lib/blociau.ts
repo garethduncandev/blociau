@@ -211,6 +211,7 @@ export class Blociau {
     const MAX_STEPS = 300; // reduce scenarios where time between frames is huge
     let currentStep = 0;
     let frameReady = false;
+    let requireScroll = false;
 
     while (!frameReady) {
       if (this.runningState !== "running") {
@@ -277,14 +278,43 @@ export class Blociau {
       );
       this.updateHistory(this.renderedRows, this.index);
       this.increaseIndex(this.index);
-      this.scrollIfRequired(this.index);
+
+      requireScroll = this.scrollIfRequired(this.index);
+
+      if (requireScroll) {
+        this.updateCanvasGrid(this.options.inputType, requireScroll);
+      }
+
       currentStep++;
     }
 
     currentStep = 0;
+
     this.renderer.render(this.canvasGrid, this.renderedRows);
 
     this.run(false);
+  }
+
+  private updateCanvasGrid(
+    inputType: "img" | "random",
+    requireScroll: boolean,
+  ): void {
+    if (inputType === "img") {
+      return;
+    }
+
+    if (!requireScroll) {
+      return;
+    }
+
+    // remove first row of grid, and append new random row
+
+    const newRow = new RandomGridGenerator().createRow(
+      this.maxCharactersPerRow,
+    );
+
+    this.canvasGrid.rows.shift();
+    this.canvasGrid.rows.push(newRow);
   }
 
   private calculateRenderTime(
@@ -439,7 +469,7 @@ export class Blociau {
     }
   }
 
-  private scrollIfRequired(index: Index): void {
+  private scrollIfRequired(index: Index): boolean {
     if (
       index.character === this.maxCharactersPerRow - 1 &&
       index.row === this.maxVisibleRows - 1
@@ -447,7 +477,9 @@ export class Blociau {
       index.character = 0;
       const [, ...newArray] = this.renderedRows;
       this.renderedRows = newArray;
+      return true;
     }
+    return false;
   }
 
   private calculateMistakesCount(): number {
