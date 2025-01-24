@@ -55,6 +55,10 @@ export class Blociau {
     this.start();
   }
 
+  public exportGrid(): CanvasGrid {
+    return structuredClone(this.canvasGrid);
+  }
+
   public reset(): void {
     this.runningState = "reset";
     if (this.renderer) {

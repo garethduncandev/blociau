@@ -63,6 +63,16 @@ export class BlociauElement extends LitElement {
           ? html`<button @click="${() => this.resume()}">Continue</button>`
           : ""}
       </div>
+      <div>
+        ${html`<button @click="${() => this.exportGrid()}">
+          export grid
+        </button>`}
+      </div>
+      <div>
+        ${html`<button @click="${() => this.exportGridJson()}">
+          Export grid as json
+        </button>`}
+      </div>
     `;
   }
 
@@ -93,6 +103,16 @@ export class BlociauElement extends LitElement {
     this.blociau?.restart();
     this.runningState = "running";
     this.requestUpdate(this.runningState);
+  }
+
+  private exportGrid(): void {
+    const grid = this.blociau?.exportGrid();
+    console.log(grid);
+  }
+
+  private exportGridJson(): void {
+    const grid = this.blociau?.exportGrid();
+    console.log(JSON.stringify(grid));
   }
 
   static styles = css``;

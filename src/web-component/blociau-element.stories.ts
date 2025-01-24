@@ -26,10 +26,10 @@ const image = await loadImg("vite.svg");
 const imageExample: Options = {
   canvasHeight: 100,
   canvasWidth: 100,
-  characterHeight: 1,
-  characterWidth: 1,
+  characterHeight: 5,
+  characterWidth: 3,
   padding: 0.1,
-  borderRadius: 0.1,
+  borderRadius: 0.5,
   wordStyles: [
     {
       wordLength: 1,
@@ -96,7 +96,7 @@ const continuousExample: Options = {
   outputType: "svg",
   outputElement: outputElement,
   keystrokeCorrectPercentage: 99,
-  speed: 10,
+  speed: 1,
   minTypingDelayMilliseconds: 50,
   maxTypingDelayMilliseconds: 150,
   historySize: 5,
