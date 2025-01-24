@@ -15,6 +15,7 @@ export interface CanvasCharacter {
 
 export interface RenderedRow {
   line: number;
+  type: RenderedRowType;
   characters: RenderedCharacter[];
 }
 
@@ -30,3 +31,5 @@ export interface RenderedWord {
   wordLength: number;
   color: string;
 }
+
+export type RenderedRowType = "code" | "comment" | "empty";

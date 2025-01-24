@@ -12,6 +12,7 @@ export class SvgRenderer implements Renderer {
     public outputElement: HTMLElement,
     public padding: number,
     public borderRadius: number,
+    public commentColor: string,
   ) {}
 
   public render(grid: CanvasGrid, renderedRows: RenderedRow[]): void {
@@ -29,7 +30,13 @@ export class SvgRenderer implements Renderer {
       renderedRowIndex++
     ) {
       const renderedRow = renderedRows[renderedRowIndex];
-      this.renderRow(paths, grid, renderedRowIndex, renderedRow);
+      this.renderRow(
+        paths,
+        grid,
+        renderedRowIndex,
+        renderedRow,
+        this.commentColor,
+      );
     }
   }
 
@@ -50,6 +57,7 @@ export class SvgRenderer implements Renderer {
     grid: CanvasGrid,
     renderedRowIndex: number,
     renderedRow: RenderedRow,
+    commentColor: string,
   ): void {
     for (
       let characterIndex = 0;
@@ -107,10 +115,12 @@ export class SvgRenderer implements Renderer {
         paths,
         grid,
         renderedRowIndex,
+        renderedRow,
         characterIndex,
         svgCharacter,
         previousSvgCharacter,
         nextSvgCharacter,
+        commentColor,
       );
     }
   }
@@ -119,11 +129,13 @@ export class SvgRenderer implements Renderer {
     paths: NodeListOf<SVGPathElement> | never[],
     grid: CanvasGrid,
     renderedRowIndex: number,
+    renderedRow: RenderedRow,
     renderedCharacterIndex: number,
 
     svgCharacter: SvgCharacter,
     previousSvgCharacter: SvgCharacter | undefined,
     nextSvgCharacter: SvgCharacter | undefined,
+    commentColor: string,
   ): void {
     const path =
       paths[
@@ -144,12 +156,16 @@ export class SvgRenderer implements Renderer {
     const gridEntry = row.characters[renderedCharacterIndex];
     const visible = gridEntry.visible;
 
-    if (!visible) {
-      path.setAttribute("fill", "transparent");
+    if (renderedRow.type === "empty" || !visible) {
+      this.setPathAttribute("fill", "transparent", path);
       return;
     }
 
-    path.setAttribute("fill", svgCharacter.color);
+    if (renderedRow.type === "comment") {
+      this.setPathAttribute("fill", commentColor, path);
+    } else {
+      this.setPathAttribute("fill", svgCharacter.color, path);
+    }
 
     const startX = renderedCharacterIndex * this.characterWidth;
     const startY = renderedRowIndex * this.characterHeight;
@@ -171,7 +187,13 @@ export class SvgRenderer implements Renderer {
       border,
     );
 
-    path.setAttribute("d", newPath);
+    this.setPathAttribute("d", newPath, path);
+  }
+
+  private setPathAttribute(attribute: string, value: string, path: Element) {
+    if (path.getAttribute(attribute) !== value) {
+      path.setAttribute(attribute, value);
+    }
   }
 
   private renderSvg(grid: CanvasGrid, outputElement: HTMLElement) {
@@ -241,9 +263,9 @@ export class SvgRenderer implements Renderer {
           "none",
         );
 
-        characterPath.setAttribute("d", attributeValue);
+        this.setPathAttribute("d", attributeValue, characterPath);
         characterPath.classList.add(`char-${rowIndex}-${charIndex}`);
-        characterPath.setAttribute("fill", "transparent");
+        this.setPathAttribute("d", attributeValue, characterPath);
 
         paths.push(characterPath);
         startX += this.characterWidth;

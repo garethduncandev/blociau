@@ -12,7 +12,7 @@ import { Options } from "../lib/models/options";
 @customElement("blociau-element")
 export class BlociauElement extends LitElement {
   @property({ type: String })
-  public runningState: RunningState = "stopped";
+  public runningState: RunningState = "reset";
 
   @property({ attribute: false })
   options: Options | undefined;
@@ -45,12 +45,17 @@ export class BlociauElement extends LitElement {
       </div>
       <div>
         ${this.runningState === "running"
-          ? html`<button @click="${() => this.stop()}">Stop</button>`
+          ? html`<button @click="${() => this.stop()}">Reset</button>`
           : ""}
       </div>
       <div>
-        ${this.runningState === "stopped"
+        ${this.runningState === "reset"
           ? html`<button @click="${() => this.start()}">Start</button>`
+          : ""}
+      </div>
+      <div>
+        ${this.runningState === "running"
+          ? html`<button @click="${() => this.restart()}">Restart</button>`
           : ""}
       </div>
       <div>
@@ -68,8 +73,8 @@ export class BlociauElement extends LitElement {
   }
 
   private stop(): void {
-    this.blociau?.stop();
-    this.runningState = "stopped";
+    this.blociau?.reset();
+    this.runningState = "reset";
     this.requestUpdate(this.runningState);
   }
 
@@ -81,6 +86,11 @@ export class BlociauElement extends LitElement {
 
   private start(): void {
     this.blociau?.start();
+    this.runningState = "running";
+    this.requestUpdate(this.runningState);
+  }
+  private restart(): void {
+    this.blociau?.restart();
     this.runningState = "running";
     this.requestUpdate(this.runningState);
   }

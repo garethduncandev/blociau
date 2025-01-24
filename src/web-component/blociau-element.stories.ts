@@ -24,10 +24,10 @@ outputElement.id = "output";
 const image = await loadImg("vite.svg");
 
 const imageExample: Options = {
-  canvasHeight: 32,
-  canvasWidth: 32,
-  characterHeight: 2,
-  characterWidth: 2,
+  canvasHeight: 100,
+  canvasWidth: 100,
+  characterHeight: 1,
+  characterWidth: 1,
   padding: 0.1,
   borderRadius: 0.1,
   wordStyles: [
@@ -57,14 +57,19 @@ const imageExample: Options = {
   maxTypingDelayMilliseconds: 150,
   historySize: 5,
   image: image,
+  minLines: 2,
+  maxLines: 10,
+  commentColor: "rgb(106, 153, 85)",
 };
 
 export const Default = () =>
-  html`<blociau-element .options=${imageExample}></blociau-element>`;
+  html`<div style="width:400px; height:400px;">
+    <blociau-element .options=${imageExample}></blociau-element>
+  </div>`;
 
 const continuousExample: Options = {
-  canvasHeight: 50,
-  canvasWidth: 100,
+  canvasHeight: 400,
+  canvasWidth: 400,
   characterHeight: 10,
   characterWidth: 10,
   padding: 0.1,
@@ -91,12 +96,17 @@ const continuousExample: Options = {
   outputType: "svg",
   outputElement: outputElement,
   keystrokeCorrectPercentage: 99,
-  speed: 1,
+  speed: 10,
   minTypingDelayMilliseconds: 50,
   maxTypingDelayMilliseconds: 150,
   historySize: 5,
   image: undefined,
+  minLines: 2,
+  maxLines: 10,
+  commentColor: "rgb(106, 153, 85)",
 };
 
 export const Continuous = () =>
-  html`<blociau-element .options=${continuousExample}></blociau-element>`;
+  html`<div style="width:400px; height:400px;">
+    <blociau-element .options=${continuousExample}></blociau-element>
+  </div>`;

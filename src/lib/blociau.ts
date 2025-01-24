@@ -5,6 +5,7 @@ import {
   CanvasGrid,
   RenderedCharacter,
   RenderedRow,
+  RenderedRowType,
 } from "./models/grid";
 import { Options, WordStyle } from "./models/options";
 import { Renderer } from "./renderers/renderer";
@@ -20,7 +21,7 @@ export class Blociau {
   private renderer!: Renderer;
 
   // states, timestamps and indexes
-  public runningState: RunningState = "stopped";
+  public runningState: RunningState = "reset";
   public index: Index = { row: 0, character: 0 };
   private mistakesCount = 0;
   private currentWordColor: string | undefined = undefined;
@@ -49,8 +50,13 @@ export class Blociau {
     this.run(true);
   }
 
-  public stop(): void {
-    this.runningState = "stopped";
+  public restart(): void {
+    this.reset();
+    this.start();
+  }
+
+  public reset(): void {
+    this.runningState = "reset";
     if (this.renderer) {
       // clear previous render
       this.renderer.destroy();
@@ -86,7 +92,6 @@ export class Blociau {
     document.addEventListener("visibilitychange", () => {
       if (document.hidden) {
         if (this.runningState === "running") {
-          console.log("auto pausing");
           this.autoPause();
         }
       } else {
@@ -160,6 +165,7 @@ export class Blociau {
           options.outputElement,
           options.padding,
           options.borderRadius,
+          options.commentColor,
         );
       }
       case "canvas": {
@@ -184,7 +190,14 @@ export class Blociau {
       this.renderedRows.length === 0 ||
       this.index.row >= this.renderedRows.length
     ) {
-      this.renderedRows.push({ characters: [], line: 0 });
+      // calculate row type
+      const renderedRowType = this.calculateRenderedRowType();
+
+      this.renderedRows.push({
+        characters: [],
+        line: 0,
+        type: renderedRowType,
+      });
     }
 
     const renderedRow = this.renderedRows[this.index.row];
@@ -202,13 +215,61 @@ export class Blociau {
       });
     }
   }
+
+  private calculateRenderedRowType(): RenderedRowType {
+    if (this.renderedRows.length === 0) {
+      return "comment";
+    }
+
+    const lastTwoTypes = this.renderedRows.map((x) => x.type).slice(-2);
+    if (
+      lastTwoTypes.length === 2 &&
+      lastTwoTypes.every((type) => type === "comment")
+    ) {
+      return "code";
+    }
+
+    // previous 2 row types
+    const lastRowType =
+      lastTwoTypes.length > 0 && lastTwoTypes[lastTwoTypes.length - 1];
+
+    if (lastRowType === "empty") {
+      return "comment";
+    }
+
+    // if last row type is comment, then return another comment 50% of the time
+    if (lastRowType === "comment") {
+      const random = Math.random();
+      return random < 0.5 ? "comment" : "code";
+    }
+
+    // random number between this.options.minLines and this.options.maxLines
+    const minLines = this.options.minLines;
+    const maxLines = this.options.maxLines;
+    const randomLines = Math.floor(
+      Math.random() * (maxLines - minLines + 1) + minLines,
+    );
+
+    // if previous number of lines that equal randomLines contains no empty rows, then its time for an empty row
+    const previousRows = this.renderedRows
+      .map((x) => x.type)
+      .slice(-randomLines);
+    const emptyRowsFound = previousRows.some((x) => x === "empty");
+
+    if (!emptyRowsFound) {
+      return "empty";
+    }
+
+    return "code";
+  }
+
   private requestCount = 0;
   private onRequestAnimationFrame(
     timestamp: DOMHighResTimeStamp,
     resetTimestamp: boolean,
   ): void {
     this.requestCount++;
-    const MAX_STEPS = 300; // reduce scenarios where time between frames is huge
+    const MAX_STEPS = 144; // reduce scenarios where time between frames is huge
     let currentStep = 0;
     let frameReady = false;
     let requireScroll = false;
@@ -524,7 +585,7 @@ export class Blociau {
   }
 }
 
-export type RunningState = "running" | "paused" | "autoPaused" | "stopped";
+export type RunningState = "running" | "paused" | "autoPaused" | "reset";
 interface Index {
   row: number;
   character: number;

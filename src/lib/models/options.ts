@@ -16,6 +16,9 @@ export class Options {
     public borderRadius: number,
     public padding: number,
     public image: HTMLImageElement | undefined,
+    public minLines: number,
+    public maxLines: number,
+    public commentColor: string,
   ) {}
 }
 
