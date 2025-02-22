@@ -1,3 +1,5 @@
+import { CanvasGrid } from "./grid";
+
 export class Options {
   public constructor(
     public canvasHeight: number,
@@ -5,7 +7,7 @@ export class Options {
     public characterHeight: number,
     public characterWidth: number,
     public wordStyles: WordStyle[],
-    public inputType: "img" | "random",
+    public inputType: InputType,
     public outputType: "svg" | "canvas",
     public outputElement: HTMLElement,
     public minTypingDelayMilliseconds: number,
@@ -16,6 +18,7 @@ export class Options {
     public borderRadius: number,
     public padding: number,
     public image: HTMLImageElement | undefined,
+    public grid: CanvasGrid | undefined,
     public minLines: number,
     public maxLines: number,
     public commentColor: string,
@@ -28,3 +31,6 @@ export class WordStyle {
     public colors: string[],
   ) {}
 }
+
+export type InputType = "img" | "random" | "grid";
+export type OutputType = "svg" | "canvas";

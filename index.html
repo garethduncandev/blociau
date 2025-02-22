@@ -6,9 +6,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Vite + Lit + TS</title>
     <link rel="stylesheet" href="./src/index.css" />
-    <script type="module" src="/src/stories/blociau-element.ts"></script>
+    <script type="module" src="/src/web-component/blociau-element.ts"></script>
   </head>
   <body>
-    <blociau-element> </blociau-element>
+    <blociau-element
+      options='{
+        "canvasHeight": 400,
+        "canvasWidth": 400,
+        "characterHeight": 10,
+        "characterWidth": 10,
+        "wordStyles": [
+          {
+            "wordLength": 1,
+            "colors": ["rgb(0, 105, 243)", "rgb(197, 134, 160)"]
+          },
+          {
+            "wordLength": 2,
+            "colors": ["rgb(79, 193, 255)", "rgb(156, 220, 254)", "rgb(0, 89, 206)"]
+          },
+          {
+            "wordLength": 3,
+            "colors": ["rgb(189, 87, 129)", "rgb(77, 201, 176)", "rgb(0, 122, 216)"]
+          },
+          {
+            "wordLength": 4,
+            "colors": ["rgb(220, 220, 138)", "rgb(106, 153, 81)"]
+          }
+        ],
+        "inputType": "random",
+        "outputType": "svg",
+        "outputElementId": "output",
+        "minTypingDelayMilliseconds": 50,
+        "maxTypingDelayMilliseconds": 150,
+        "speed": 1,
+        "historySize": 5,
+        "keystrokeCorrectPercentage": 99,
+        "borderRadius": 0.1,
+        "padding": 0.1,
+        "imageSrc": null,
+        "grid": null,
+        "minLines": 2,
+        "maxLines": 10,
+        "commentColor": "rgb(106, 153, 85)"
+      }'
+    ></blociau-element>
   </body>
 </html>

@@ -14,7 +14,7 @@ export class BlociauElement extends LitElement {
   @property({ type: String })
   public runningState: RunningState = "reset";
 
-  @property({ attribute: false })
+  @property({ type: Options })
   options: Options | undefined;
 
   private blociau: Blociau | undefined;

@@ -110,7 +110,12 @@ export class Blociau {
     let rowsCount = 0;
     let rowCharactersCount = 0;
 
-    if (options.inputType === "img" && options.image) {
+    if (options.inputType === "grid" && options.grid) {
+      rowsCount = options.grid.rows.length;
+      rowCharactersCount = options.grid.rows[0].characters.length;
+    }
+
+    else if (options.inputType === "img" && options.image) {
       rowsCount = options.image.height / options.characterHeight;
       rowCharactersCount = options.image.width / options.characterWidth;
     } else {
@@ -122,9 +127,7 @@ export class Blociau {
     this.maxCharactersPerRow = Math.floor(rowCharactersCount);
   }
 
-  private async createCanvasGrid(
-    inputType: "img" | "random",
-  ): Promise<CanvasGrid> {
+  private async createCanvasGrid(inputType: InputType): Promise<CanvasGrid> {
     switch (inputType) {
       case "img": {
         if (!this.options.image) {
@@ -142,6 +145,13 @@ export class Blociau {
           this.maxVisibleRows,
           this.maxCharactersPerRow,
         );
+      }
+      case "grid": {
+        if (!this.options.grid) {
+          throw new Error("Grid is required when inputType is grid");
+        }
+
+        return this.options.grid;
       }
     }
   }
@@ -360,11 +370,8 @@ export class Blociau {
     this.run(false);
   }
 
-  private updateCanvasGrid(
-    inputType: "img" | "random",
-    requireScroll: boolean,
-  ): void {
-    if (inputType === "img") {
+  private updateCanvasGrid(inputType: InputType, requireScroll: boolean): void {
+    if (inputType === "img" || inputType === "grid") {
       return;
     }
 
@@ -594,3 +601,5 @@ interface Index {
   row: number;
   character: number;
 }
+
+export type InputType = "img" | "random" | "grid";
