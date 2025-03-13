@@ -29,6 +29,11 @@ export class BlociauElement extends LitElement {
     }
 
     super.connectedCallback();
+    this.options = JSON.parse(this.options as unknown as string) as Options;
+    // create new htmlElement
+
+    this.options.outputElement = document.createElement("div");
+    this.options.outputElement.id = "output";
     this.blociau = await new Blociau(this.options);
     await this.blociau.start();
     this.runningState = this.blociau.runningState;
@@ -37,7 +42,7 @@ export class BlociauElement extends LitElement {
 
   protected render() {
     return html`
-      <div id="output">${this.options?.outputElement}</div>
+      <div id="output-wc">${this.options?.outputElement}</div>
       <div>
         ${this.runningState === "running"
           ? html`<button @click="${() => this.pause()}">Pause</button>`

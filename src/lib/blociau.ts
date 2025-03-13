@@ -113,9 +113,7 @@ export class Blociau {
     if (options.inputType === "grid" && options.grid) {
       rowsCount = options.grid.rows.length;
       rowCharactersCount = options.grid.rows[0].characters.length;
-    }
-
-    else if (options.inputType === "img" && options.image) {
+    } else if (options.inputType === "img" && options.image) {
       rowsCount = options.image.height / options.characterHeight;
       rowCharactersCount = options.image.width / options.characterWidth;
     } else {
@@ -309,9 +307,12 @@ export class Blociau {
         break;
       }
 
+      const rowType = this.renderedRows[this.index.row].type;
+
       const characterRenderTime = this.calculateRenderTime(
         gridCharacter.visible,
         previousTimestamp,
+        rowType,
       );
 
       // replace current state with history
@@ -392,8 +393,9 @@ export class Blociau {
   private calculateRenderTime(
     characterVisible: boolean,
     previousTimestamp: DOMHighResTimeStamp,
+    rowType: RenderedRowType,
   ): DOMHighResTimeStamp {
-    if (!characterVisible) {
+    if (!characterVisible || rowType === "empty") {
       return previousTimestamp;
     }
 
